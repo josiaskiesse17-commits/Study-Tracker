@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../providers/auth_controller.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
@@ -41,6 +42,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     ref.listen<AuthState>(
       authControllerProvider,
@@ -62,7 +64,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create account'),
+        title: Text(l10n.createAccount),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -76,9 +78,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Create your StudyTrack account',
-                    style: TextStyle(
+                  Text(
+                    l10n.createStudyTrackAccount,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -87,13 +89,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _fullNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Full name',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.fullName,
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter your full name';
+                        return l10n.enterFullName;
                       }
 
                       return null;
@@ -103,17 +105,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.email,
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter your email';
+                        return l10n.enterEmail;
                       }
 
                       if (!value.contains('@')) {
-                        return 'Enter a valid email';
+                        return l10n.enterValidEmail;
                       }
 
                       return null;
@@ -123,17 +125,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.password,
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Enter a password';
+                        return l10n.enterPassword;
                       }
 
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return l10n.passwordMinLength;
                       }
 
                       return null;
@@ -150,16 +152,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text('Register'),
+                        : Text(l10n.register),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       context.go('/login');
                     },
-                    child: const Text(
-                      'Already have an account? Login',
-                    ),
+                    child: Text(l10n.alreadyHaveAccount),
                   ),
                 ],
               ),

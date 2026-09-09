@@ -1,0 +1,154 @@
+﻿{
+  "@@locale": "fr",
+
+  "login": "Connexion",
+  "welcomeBack": "Bon retour sur StudyTrack",
+  "email": "E-mail",
+  "password": "Mot de passe",
+  "createAccount": "Créer un compte",
+  "createStudyTrackAccount": "Créez votre compte StudyTrack",
+  "register": "S'inscrire",
+  "fullName": "Nom complet",
+  "alreadyHaveAccount": "Vous avez déjà un compte ? Connexion",
+  "enterFullName": "Entrez votre nom complet",
+  "enterEmail": "Entrez votre e-mail",
+  "enterValidEmail": "Entrez un e-mail valide",
+  "enterPassword": "Entrez votre mot de passe",
+  "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+
+  "dashboard": "Tableau de bord",
+  "courses": "Cours",
+  "work": "Travail",
+  "projects": "Projets",
+  "profile": "Profil",
+
+  "projectDetails": "Détails du projet",
+  "projectContent": "Contenu du projet",
+  "milestones": "Jalons",
+  "coursesAssociated": "Cours associés à ce projet",
+  "workAssociated": "Travail associé à ce projet",
+  "noDeadline": "Aucune échéance",
+
+  "there": "vous",
+  "welcomeUser": "Bienvenue, {name} !",
+  "@welcomeUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "switchToLightMode": "Passer au mode clair",
+  "switchToDarkMode": "Passer au mode sombre",
+  "logout": "Déconnexion",
+  "keepLearningMessage": "Continuez à apprendre, restez organisé et progressez chaque jour.",
+  "yourWorkspace": "Votre espace de travail",
+  "manageLearningMessage": "Gérez votre apprentissage depuis un seul endroit.",
+  "trackCourseProgress": "Suivez la progression de vos cours",
+  "organizeAccomplish": "Organisez ce que vous devez accomplir",
+  "manageLargerProjects": "Gérez vos projets plus importants",
+  "stayConsistent": "Restez constant",
+  "stayConsistentMessage": "Découpez vos objectifs d'apprentissage en petites tâches et maintenez vos cours à jour.",
+
+  "myCourses": "Mes cours",
+  "createCourse": "Créer un cours",
+  "unableToLoadCourses": "Impossible de charger les cours.",
+  "noCoursesYet": "Aucun cours pour le moment",
+  "createFirstCourse": "Créez votre premier cours et commencez à suivre votre progression.",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "progress": "Progression",
+  "deleteCourse": "Supprimer le cours ?",
+  "deleteCourseConfirmation": "Voulez-vous vraiment supprimer « {courseName} » ?",
+  "@deleteCourseConfirmation": {
+    "placeholders": {
+      "courseName": {}
+    }
+  },
+  "cancel": "Annuler",
+  "failedToDeleteCourse": "Échec de la suppression du cours : {error}",
+  "@failedToDeleteCourse": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editCourse": "Modifier le cours",
+  "courseName": "Nom du cours",
+  "description": "Description",
+  "optional": "Facultatif",
+  "courseNameRequired": "Le nom du cours est obligatoire.",
+  "saveChanges": "Enregistrer les modifications",
+  "create": "Créer",
+  "failedToSaveCourse": "Échec de l'enregistrement du cours : {error}",
+  "@failedToSaveCourse": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "tryAgain": "Réessayer",
+
+  "createWorkItem": "Créer un élément de travail",
+  "noWorkYet": "Aucun travail pour le moment",
+  "addWorkDescription": "Ajoutez des devoirs, travaux, lectures, examens, exercices et autres tâches à accomplir.",
+  "addWork": "Ajouter un travail",
+  "workActions": "Actions du travail",
+  "deleteWork": "Supprimer le travail ?",
+  "deleteWorkConfirmation": "Voulez-vous vraiment supprimer « {title} » ?",
+  "@deleteWorkConfirmation": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "editWork": "Modifier le travail",
+  "createWork": "Créer un travail",
+  "title": "Titre",
+  "type": "Type",
+  "status": "Statut",
+  "priority": "Priorité",
+  "dueDate": "Date d'échéance",
+  "tapToChange": "Appuyez pour modifier",
+  "removeDueDate": "Supprimer la date d'échéance",
+  "titleRequired": "Le titre est obligatoire.",
+  "failedToSaveWork": "Échec de l'enregistrement du travail : {error}",
+  "@failedToSaveWork": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "homework": "Devoir",
+  "assignment": "Travail",
+  "reading": "Lecture",
+  "exercise": "Exercice",
+  "exam": "Examen",
+  "quiz": "Quiz",
+  "practice": "Pratique",
+  "other": "Autre",
+  "pending": "En attente",
+  "inProgress": "En cours",
+  "completed": "Terminé",
+  "highPriority": "Priorité élevée",
+  "mediumPriority": "Priorité moyenne",
+  "lowPriority": "Priorité faible",
+  "unableToLoadWork": "Impossible de charger le travail",
+
+  "unableToLoadProjects": "Impossible de charger les projets.",
+  "retry": "Réessayer",
+  "addProject": "Ajouter un projet",
+  "createProject": "Créer un projet",
+  "editProject": "Modifier le projet",
+  "name": "Nom",
+  "projectName": "Nom du projet",
+  "optionalDescription": "Description facultative",
+  "planning": "Planification",
+  "clearDeadline": "Effacer l'échéance",
+  "projectNameRequired": "Le nom du projet est obligatoire.",
+  "save": "Enregistrer",
+  "deleteProject": "Supprimer le projet ?",
+  "permanentlyDeleteProject": "Cette action supprimera définitivement « {projectName} ».",
+  "@permanentlyDeleteProject": {
+    "placeholders": {
+      "projectName": {}
+    }
+  },
+  "noProjectsYet": "Aucun projet pour le moment",
+  "createProjectDescription": "Créez un projet pour organiser un travail plus important.",
+  "projectActions": "Actions du projet"
+}

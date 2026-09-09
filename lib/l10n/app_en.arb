@@ -1,0 +1,154 @@
+﻿{
+  "@@locale": "en",
+
+  "login": "Login",
+  "welcomeBack": "Welcome back to StudyTrack",
+  "email": "Email",
+  "password": "Password",
+  "createAccount": "Create an account",
+  "createStudyTrackAccount": "Create your StudyTrack account",
+  "register": "Register",
+  "fullName": "Full name",
+  "alreadyHaveAccount": "Already have an account? Login",
+  "enterFullName": "Enter your full name",
+  "enterEmail": "Enter your email",
+  "enterValidEmail": "Enter a valid email",
+  "enterPassword": "Enter your password",
+  "passwordMinLength": "Password must be at least 6 characters",
+
+  "dashboard": "Dashboard",
+  "courses": "Courses",
+  "work": "Work",
+  "projects": "Projects",
+  "profile": "Profile",
+
+  "projectDetails": "Project Details",
+  "projectContent": "Project content",
+  "milestones": "Milestones",
+  "coursesAssociated": "Courses associated with this project",
+  "workAssociated": "Work associated with this project",
+  "noDeadline": "No deadline",
+
+  "there": "there",
+  "welcomeUser": "Welcome, {name}!",
+  "@welcomeUser": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "switchToLightMode": "Switch to light mode",
+  "switchToDarkMode": "Switch to dark mode",
+  "logout": "Logout",
+  "keepLearningMessage": "Keep learning, stay organized, and make progress every day.",
+  "yourWorkspace": "Your workspace",
+  "manageLearningMessage": "Manage your learning from one place.",
+  "trackCourseProgress": "Track your course progress",
+  "organizeAccomplish": "Organize what you need to accomplish",
+  "manageLargerProjects": "Manage your larger projects",
+  "stayConsistent": "Stay consistent",
+  "stayConsistentMessage": "Break your learning goals into small tasks and keep your courses up to date.",
+
+  "myCourses": "My Courses",
+  "createCourse": "Create course",
+  "unableToLoadCourses": "Unable to load courses.",
+  "noCoursesYet": "No courses yet",
+  "createFirstCourse": "Create your first course and start tracking your progress.",
+  "edit": "Edit",
+  "delete": "Delete",
+  "progress": "Progress",
+  "deleteCourse": "Delete course?",
+  "deleteCourseConfirmation": "Are you sure you want to delete \"{courseName}\"?",
+  "@deleteCourseConfirmation": {
+    "placeholders": {
+      "courseName": {}
+    }
+  },
+  "cancel": "Cancel",
+  "failedToDeleteCourse": "Failed to delete course: {error}",
+  "@failedToDeleteCourse": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editCourse": "Edit course",
+  "courseName": "Course name",
+  "description": "Description",
+  "optional": "Optional",
+  "courseNameRequired": "Course name is required.",
+  "saveChanges": "Save changes",
+  "create": "Create",
+  "failedToSaveCourse": "Failed to save course: {error}",
+  "@failedToSaveCourse": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "tryAgain": "Try again",
+
+  "createWorkItem": "Create work item",
+  "noWorkYet": "No work yet",
+  "addWorkDescription": "Add homework, assignments, readings, exams, exercises and other things you need to accomplish.",
+  "addWork": "Add work",
+  "workActions": "Work actions",
+  "deleteWork": "Delete work?",
+  "deleteWorkConfirmation": "Are you sure you want to delete \"{title}\"?",
+  "@deleteWorkConfirmation": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "editWork": "Edit work",
+  "createWork": "Create work",
+  "title": "Title",
+  "type": "Type",
+  "status": "Status",
+  "priority": "Priority",
+  "dueDate": "Due date",
+  "tapToChange": "Tap to change",
+  "removeDueDate": "Remove due date",
+  "titleRequired": "Title is required.",
+  "failedToSaveWork": "Failed to save work: {error}",
+  "@failedToSaveWork": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "homework": "Homework",
+  "assignment": "Assignment",
+  "reading": "Reading",
+  "exercise": "Exercise",
+  "exam": "Exam",
+  "quiz": "Quiz",
+  "practice": "Practice",
+  "other": "Other",
+  "pending": "Pending",
+  "inProgress": "In progress",
+  "completed": "Completed",
+  "highPriority": "High priority",
+  "mediumPriority": "Medium priority",
+  "lowPriority": "Low priority",
+  "unableToLoadWork": "Unable to load work",
+
+  "unableToLoadProjects": "Unable to load projects.",
+  "retry": "Retry",
+  "addProject": "Add project",
+  "createProject": "Create project",
+  "editProject": "Edit project",
+  "name": "Name",
+  "projectName": "Project name",
+  "optionalDescription": "Optional description",
+  "planning": "Planning",
+  "clearDeadline": "Clear deadline",
+  "projectNameRequired": "Project name is required.",
+  "save": "Save",
+  "deleteProject": "Delete project?",
+  "permanentlyDeleteProject": "This will permanently delete \"{projectName}\".",
+  "@permanentlyDeleteProject": {
+    "placeholders": {
+      "projectName": {}
+    }
+  },
+  "noProjectsYet": "No projects yet",
+  "createProjectDescription": "Create a project to organize a larger piece of work.",
+  "projectActions": "Project actions"
+}

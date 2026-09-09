@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../providers/auth_controller.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -38,6 +39,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     ref.listen<AuthState>(
       authControllerProvider,
@@ -59,7 +61,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text(l10n.login),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -73,9 +75,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Welcome back to StudyTrack',
-                    style: TextStyle(
+                  Text(
+                    l10n.welcomeBack,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -85,17 +87,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.email,
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Enter your email';
+                        return l10n.enterEmail;
                       }
 
                       if (!value.contains('@')) {
-                        return 'Enter a valid email';
+                        return l10n.enterValidEmail;
                       }
 
                       return null;
@@ -105,17 +107,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.password,
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Enter your password';
+                        return l10n.enterPassword;
                       }
 
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return l10n.passwordMinLength;
                       }
 
                       return null;
@@ -132,16 +134,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text('Login'),
+                        : Text(l10n.login),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       context.push('/register');
                     },
-                    child: const Text(
-                      'Create an account',
-                    ),
+                    child: Text(l10n.createAccount),
                   ),
                 ],
               ),

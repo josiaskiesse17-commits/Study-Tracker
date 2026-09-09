@@ -1,12 +1,12 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:study_tracker/core/storage/app_database.dart';
-import 'package:study_tracker/features/tasks/data/datasources/task_local_datasource.dart';
-import 'package:study_tracker/features/tasks/data/datasources/task_remote_datasource.dart';
-import 'package:study_tracker/features/tasks/data/models/task_model.dart';
-import 'package:study_tracker/features/tasks/data/repositories/task_repository_impl.dart';
+import 'package:study_tracker/features/work/data/datasources/task_local_datasource.dart';
+import 'package:study_tracker/features/work/data/datasources/task_remote_datasource.dart';
+import 'package:study_tracker/features/work/data/models/task_model.dart';
+import 'package:study_tracker/features/work/data/repositories/task_repository_impl.dart';
 
 class MockTaskRemoteDataSource extends Mock
     implements TaskRemoteDataSource {}
@@ -14,7 +14,7 @@ class MockTaskRemoteDataSource extends Mock
 class MockTaskLocalDataSource extends Mock
     implements TaskLocalDataSource {}
 
-class MockAppDatabase extends Mock implements AppDatabase {}
+class MockConnectivity extends Mock implements Connectivity {}
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
@@ -25,27 +25,31 @@ void main() {
 
   late MockTaskRemoteDataSource remoteDataSource;
   late MockTaskLocalDataSource localDataSource;
-  late MockAppDatabase database;
+  late MockConnectivity connectivity;
   late MockSupabaseClient supabase;
   late MockGoTrueClient auth;
   late TaskRepositoryImpl repository;
 
   const userId = 'user-123';
 
-  final task = TaskModel(
+  final workItem = TaskModel(
     id: 'task-1',
     userId: userId,
     courseId: 'course-1',
+    projectId: null,
     title: 'Finish Dart exercise',
     description: 'Complete the exercise',
-    completed: false,
+    type: 'exercise',
+    status: 'pending',
+    priority: 'medium',
+    dueDate: DateTime(2026, 9, 10),
     createdAt: DateTime(2026, 9, 1),
   );
 
   setUp(() {
     remoteDataSource = MockTaskRemoteDataSource();
     localDataSource = MockTaskLocalDataSource();
-    database = MockAppDatabase();
+    connectivity = MockConnectivity();
     supabase = MockSupabaseClient();
     auth = MockGoTrueClient();
 
@@ -64,20 +68,20 @@ void main() {
     repository = TaskRepositoryImpl(
       remoteDataSource: remoteDataSource,
       localDataSource: localDataSource,
-      database: database,
+      connectivity: connectivity,
       supabase: supabase,
     );
   });
 
   test(
-    'getCachedTasks returns tasks from local datasource',
+    'getCachedTasks returns work items from local datasource',
     () async {
       when(() => localDataSource.getTasks(userId))
-          .thenAnswer((_) async => [task]);
+          .thenAnswer((_) async => [workItem]);
 
       final result = await repository.getCachedTasks();
 
-      expect(result, [task]);
+      expect(result, [workItem]);
 
       verify(
         () => localDataSource.getTasks(userId),

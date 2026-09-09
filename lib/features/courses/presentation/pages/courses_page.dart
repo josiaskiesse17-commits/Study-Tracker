@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../providers/course_controller.dart';
 
 class CoursesPage extends ConsumerWidget {
@@ -11,12 +12,13 @@ class CoursesPage extends ConsumerWidget {
     final coursesAsync = ref.watch(courseControllerProvider);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'My Courses',
-          style: TextStyle(
+        title: Text(
+          l10n.myCourses,
+          style: const TextStyle(
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -28,7 +30,7 @@ class CoursesPage extends ConsumerWidget {
                 _showCourseDialog(context, ref);
               },
               icon: const Icon(Icons.add_rounded),
-              tooltip: 'Create course',
+              tooltip: l10n.createCourse,
             ),
           ),
         ],
@@ -38,7 +40,7 @@ class CoursesPage extends ConsumerWidget {
           child: CircularProgressIndicator(),
         ),
         error: (error, stackTrace) => _ErrorState(
-          message: 'Unable to load courses.',
+          message: l10n.unableToLoadCourses,
           error: error.toString(),
           onRetry: () {
             ref
@@ -64,10 +66,10 @@ class CoursesPage extends ConsumerWidget {
                     color: colors.primary,
                   ),
                   const SizedBox(height: 20),
-                  const Center(
+                  Center(
                     child: Text(
-                      'No courses yet',
-                      style: TextStyle(
+                      l10n.noCoursesYet,
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                       ),
@@ -80,7 +82,7 @@ class CoursesPage extends ConsumerWidget {
                         horizontal: 40,
                       ),
                       child: Text(
-                        'Create your first course and start tracking your progress.',
+                        l10n.createFirstCourse,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: colors.onSurfaceVariant,
@@ -99,7 +101,7 @@ class CoursesPage extends ConsumerWidget {
                         _showCourseDialog(context, ref);
                       },
                       icon: const Icon(Icons.add_rounded),
-                      label: const Text('Create course'),
+                      label: Text(l10n.createCourse),
                     ),
                   ),
                 ],
@@ -186,6 +188,7 @@ class CoursesPage extends ConsumerWidget {
                                 ),
                               ),
                               PopupMenuButton<String>(
+                                tooltip: l10n.edit,
                                 onSelected: (value) {
                                   if (value == 'edit') {
                                     _showCourseDialog(
@@ -204,14 +207,14 @@ class CoursesPage extends ConsumerWidget {
                                     );
                                   }
                                 },
-                                itemBuilder: (context) => const [
+                                itemBuilder: (context) => [
                                   PopupMenuItem(
                                     value: 'edit',
                                     child: Row(
                                       children: [
-                                        Icon(Icons.edit_rounded),
-                                        SizedBox(width: 12),
-                                        Text('Edit'),
+                                        const Icon(Icons.edit_rounded),
+                                        const SizedBox(width: 12),
+                                        Text(l10n.edit),
                                       ],
                                     ),
                                   ),
@@ -219,9 +222,11 @@ class CoursesPage extends ConsumerWidget {
                                     value: 'delete',
                                     child: Row(
                                       children: [
-                                        Icon(Icons.delete_outline),
-                                        SizedBox(width: 12),
-                                        Text('Delete'),
+                                        const Icon(
+                                          Icons.delete_outline,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(l10n.delete),
                                       ],
                                     ),
                                   ),
@@ -235,7 +240,7 @@ class CoursesPage extends ConsumerWidget {
                                 MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Progress',
+                                l10n.progress,
                                 style: TextStyle(
                                   color: colors.onSurfaceVariant,
                                   fontWeight: FontWeight.w600,
@@ -277,26 +282,28 @@ class CoursesPage extends ConsumerWidget {
     String courseId,
     String courseName,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete course?'),
+          title: Text(l10n.deleteCourse),
           content: Text(
-            'Are you sure you want to delete "$courseName"?',
+            l10n.deleteCourseConfirmation(courseName),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('Delete'),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -318,7 +325,9 @@ class CoursesPage extends ConsumerWidget {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to delete course: $error'),
+          content: Text(
+            l10n.failedToDeleteCourse(error.toString()),
+          ),
         ),
       );
     }
@@ -330,6 +339,7 @@ class CoursesPage extends ConsumerWidget {
     dynamic course,
   }) {
     final isEditing = course != null;
+    final l10n = AppLocalizations.of(context)!;
 
     final nameController = TextEditingController(
       text: isEditing ? course.name : '',
@@ -352,7 +362,7 @@ class CoursesPage extends ConsumerWidget {
           builder: (context, setState) {
             return AlertDialog(
               title: Text(
-                isEditing ? 'Edit course' : 'Create course',
+                isEditing ? l10n.editCourse : l10n.createCourse,
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
                 ),
@@ -365,10 +375,10 @@ class CoursesPage extends ConsumerWidget {
                       controller: nameController,
                       textCapitalization:
                           TextCapitalization.sentences,
-                      decoration: const InputDecoration(
-                        labelText: 'Course name',
+                      decoration: InputDecoration(
+                        labelText: l10n.courseName,
                         prefixIcon:
-                            Icon(Icons.school_outlined),
+                            const Icon(Icons.school_outlined),
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -377,11 +387,11 @@ class CoursesPage extends ConsumerWidget {
                       maxLines: 3,
                       textCapitalization:
                           TextCapitalization.sentences,
-                      decoration: const InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Optional',
+                      decoration: InputDecoration(
+                        labelText: l10n.description,
+                        hintText: l10n.optional,
                         prefixIcon:
-                            Icon(Icons.notes_rounded),
+                            const Icon(Icons.notes_rounded),
                       ),
                     ),
                     const SizedBox(height: 22),
@@ -389,9 +399,9 @@ class CoursesPage extends ConsumerWidget {
                       mainAxisAlignment:
                           MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Progress',
-                          style: TextStyle(
+                        Text(
+                          l10n.progress,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -429,7 +439,7 @@ class CoursesPage extends ConsumerWidget {
                       : () {
                           Navigator.pop(dialogContext);
                         },
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: isSaving
@@ -441,9 +451,9 @@ class CoursesPage extends ConsumerWidget {
                           if (name.isEmpty) {
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
-                                  'Course name is required.',
+                                  l10n.courseNameRequired,
                                 ),
                               ),
                             );
@@ -507,7 +517,9 @@ class CoursesPage extends ConsumerWidget {
                             ).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Failed to save course: $error',
+                                  l10n.failedToSaveCourse(
+                                    error.toString(),
+                                  ),
                                 ),
                               ),
                             );
@@ -522,7 +534,7 @@ class CoursesPage extends ConsumerWidget {
                           ),
                         )
                       : Text(
-                          isEditing ? 'Save changes' : 'Create',
+                          isEditing ? l10n.saveChanges : l10n.create,
                         ),
                 ),
               ],
@@ -548,6 +560,7 @@ class _ErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Padding(
@@ -581,7 +594,7 @@ class _ErrorState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Try again'),
+              label: Text(l10n.tryAgain),
             ),
           ],
         ),

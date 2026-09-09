@@ -6,7 +6,10 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/courses/presentation/pages/courses_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
-import '../../features/tasks/presentation/pages/tasks_page.dart';
+import '../../features/projects/domain/entities/project.dart';
+import '../../features/projects/presentation/pages/project_details_page.dart';
+import '../../features/projects/presentation/pages/projects_page.dart';
+import '../../features/work/presentation/pages/tasks_page.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -34,36 +37,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/login',
-        builder: (context, state) {
-          return const LoginPage();
-        },
+        builder: (context, state) => const LoginPage(),
       ),
 
       GoRoute(
         path: '/register',
-        builder: (context, state) {
-          return const RegisterPage();
-        },
+        builder: (context, state) => const RegisterPage(),
       ),
 
       GoRoute(
         path: '/dashboard',
-        builder: (context, state) {
-          return const DashboardPage();
-        },
+        builder: (context, state) => const DashboardPage(),
       ),
 
       GoRoute(
         path: '/courses',
-        builder: (context, state) {
-          return const CoursesPage();
-        },
+        builder: (context, state) => const CoursesPage(),
       ),
 
       GoRoute(
         path: '/tasks',
+        builder: (context, state) => const TasksPage(),
+      ),
+
+      GoRoute(
+        path: '/projects',
+        builder: (context, state) => const ProjectsPage(),
+      ),
+
+      GoRoute(
+        path: '/projects/:id',
         builder: (context, state) {
-          return const TasksPage();
+          final project = state.extra as Project;
+
+          return ProjectDetailsPage(
+            project: project,
+          );
         },
       ),
     ],

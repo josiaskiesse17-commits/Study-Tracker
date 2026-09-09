@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/theme_provider.dart';
+import 'l10n/app_localizations.dart';
 
 class App extends ConsumerWidget {
   const App({super.key});
@@ -17,6 +18,9 @@ class App extends ConsumerWidget {
         return MaterialApp.router(
           title: 'StudyTrack',
           debugShowCheckedModeBanner: false,
+
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
 
           theme: ThemeData(
             useMaterial3: true,
