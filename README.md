@@ -1,6 +1,8 @@
 # StudyTrack
 
-StudyTrack is a Flutter application for organizing learning through courses and tasks.
+[![Flutter CI](https://github.com/josiaskiesse17-commits/Study-Tracker/actions/workflows/flutter.yml/badge.svg)](https://github.com/josiaskiesse17-commits/Study-Tracker/actions/workflows/flutter.yml)
+
+StudyTrack is a Flutter application for organizing learning through **courses, academic work, and projects**.
 
 ## Architecture
 
@@ -74,10 +76,19 @@ lib/
 │   ├── dashboard/
 │   │   └── presentation/
 │   │
-│   └── tasks/
+│   ├── projects/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   │
+│   └── work/
 │       ├── data/
 │       ├── domain/
 │       └── presentation/
+│
+├── l10n/
+│   ├── app_en.arb
+│   └── app_fr.arb
 │
 ├── app.dart
 └── main.dart
@@ -104,13 +115,33 @@ PATCH  /rest/v1/courses
 DELETE /rest/v1/courses
 ```
 
-### Tasks API
+### Work API
+
+Work items are stored in `work_items`:
 
 ```text
-GET    /rest/v1/tasks
-POST   /rest/v1/tasks
-PATCH  /rest/v1/tasks
-DELETE /rest/v1/tasks
+GET    /rest/v1/work_items
+POST   /rest/v1/work_items
+PATCH  /rest/v1/work_items
+DELETE /rest/v1/work_items
+```
+
+### Projects API
+
+```text
+GET    /rest/v1/projects
+POST   /rest/v1/projects
+PATCH  /rest/v1/projects
+DELETE /rest/v1/projects
+```
+
+### Milestones API
+
+```text
+GET    /rest/v1/milestones
+POST   /rest/v1/milestones
+PATCH  /rest/v1/milestones
+DELETE /rest/v1/milestones
 ```
 
 The REST API base URL is:
@@ -125,7 +156,7 @@ Supabase Auth is used for user registration and login.
 
 Authenticated API requests include the user's JWT access token:
 
-```http
+```text
 Authorization: Bearer <access_token>
 ```
 
@@ -140,7 +171,9 @@ StudyTrack uses **SQLite (`sqflite`)** for local caching.
 The application caches:
 
 * Courses
-* Tasks
+* Work items
+* Projects
+* Milestones
 
 When the device is offline, previously cached data can be loaded from SQLite.
 
@@ -158,7 +191,7 @@ Make sure the following are installed:
 
 ### 1. Install dependencies
 
-```bash
+```text
 flutter pub get
 ```
 
@@ -173,7 +206,7 @@ Create a Supabase project and obtain:
 
 Create a `.env` file in the project root:
 
-```env
+```text
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
@@ -184,56 +217,86 @@ The `.env` file is loaded when the application starts.
 
 ### 4. Configure the Supabase database
 
-The application requires the following tables:
+The application requires:
 
 ```text
 profiles
 courses
-tasks
+work_items
+projects
+project_courses
+milestones
 ```
 
-The `courses` table contains:
+Row Level Security (RLS) must be enabled so users can only access their own data and authorized project relationships.
+
+### 5. Generate localization
+
+StudyTrack supports **English and French**.
 
 ```text
-id
-user_id
-name
-description
-progress
-created_at
+flutter gen-l10n
 ```
 
-The `tasks` table contains:
+### 6. Run the application
 
 ```text
-id
-user_id
-course_id
-title
-description
-completed
-created_at
-```
-
-Row Level Security (RLS) must be enabled so users can only access their own data.
-
-### 5. Run the application
-
-```bash
 flutter run
 ```
 
-The application will connect to the Supabase project configured in `.env`.
-
 ## Main Dependencies
 
-| Package             | Purpose                             |
-| ------------------- | ----------------------------------- |
-| `flutter_riverpod`  | State management                    |
-| `go_router`         | Navigation                          |
-| `dio`               | HTTP requests                       |
-| `supabase_flutter`  | Supabase authentication and backend |
-| `sqflite`           | SQLite local storage                |
-| `connectivity_plus` | Network connectivity detection      |
-| `flutter_dotenv`    | Environment configuration           |
-| `mocktail`          | Testing                             |
+| Package              | Purpose                               |
+| -------------------- | ------------------------------------- |
+| `flutter_riverpod`   | State management                      |
+| `go_router`          | Navigation                            |
+| `dio`                | HTTP requests                         |
+| `supabase_flutter`   | Supabase authentication and backend   |
+| `sqflite`            | SQLite local storage                  |
+| `connectivity_plus`  | Network connectivity detection        |
+| `flutter_dotenv`     | Environment configuration             |
+| `shared_preferences` | Local preferences and session storage |
+| `mocktail`           | Testing                               |
+
+## Testing
+
+StudyTrack includes:
+
+* **13 unit tests**
+* **5 widget tests**
+* **2 integration tests**
+
+Run all tests:
+
+```text
+flutter test
+```
+
+Run analysis:
+
+```text
+flutter analyze
+```
+
+Integration tests:
+
+```text
+flutter test integration_test/app_test.dart
+```
+
+## CI/CD
+
+GitHub Actions automatically runs:
+
+* `flutter pub get`
+* `flutter gen-l10n`
+* `flutter analyze`
+* `flutter test`
+
+Workflow:
+
+```text
+.github/workflows/flutter.yml
+```
+
+The CI workflow runs on pushes and pull requests.
