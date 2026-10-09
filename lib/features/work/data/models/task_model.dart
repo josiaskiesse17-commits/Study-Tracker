@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/task.dart';
 
 class TaskModel extends WorkItem {
@@ -15,37 +16,39 @@ class TaskModel extends WorkItem {
     required super.createdAt,
   });
 
-  factory TaskModel.fromJson(Map<String, dynamic> json) {
+  factory TaskModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data() ?? {};
     return TaskModel(
-      id: json['id'] as String,
-      userId: json['user_id'] as String,
-      courseId: json['course_id'] as String?,
-      projectId: json['project_id'] as String?,
-      title: json['title'] as String,
-      description: json['description'] as String?,
-      type: json['type'] as String? ?? 'other',
-      status: json['status'] as String? ?? 'pending',
-      priority: json['priority'] as String? ?? 'medium',
-      dueDate: json['due_date'] != null
-          ? DateTime.parse(json['due_date'] as String)
+      id: doc.id,
+      userId: data['userId'] as String? ?? '',
+      courseId: data['courseId'] as String?,
+      projectId: data['projectId'] as String?,
+      title: data['title'] as String? ?? '',
+      description: data['description'] as String?,
+      type: data['type'] as String? ?? 'other',
+      status: data['status'] as String? ?? 'pending',
+      priority: data['priority'] as String? ?? 'medium',
+      dueDate: data['dueDate'] != null
+          ? DateTime.parse(data['dueDate'] as String)
           : null,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
-      'user_id': userId,
-      'course_id': courseId,
-      'project_id': projectId,
+      'userId': userId,
+      'courseId': courseId,
+      'projectId': projectId,
       'title': title,
       'description': description,
       'type': type,
       'status': status,
       'priority': priority,
-      'due_date': dueDate?.toIso8601String().split('T').first,
-      'created_at': createdAt.toIso8601String(),
+      'dueDate': dueDate?.toIso8601String().split('T').first,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 }

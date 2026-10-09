@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/auth_controller.dart';
 import '../../domain/entities/milestone.dart';
 import '../../domain/repositories/milestone_repository.dart';
 import 'milestone_provider.dart';
@@ -10,11 +11,14 @@ final milestoneControllerProvider =
 );
 
 class MilestoneController extends AsyncNotifier<List<Milestone>> {
-  late final MilestoneRepository _repository;
+  MilestoneRepository get _repository => ref.read(milestoneRepositoryProvider);
 
   @override
   Future<List<Milestone>> build() async {
-    _repository = ref.read(milestoneRepositoryProvider);
+    // Watch the current user ID so the list reloads when the logged-in user changes
+    ref.watch(authControllerProvider.select((s) => s.user?.id));
+
+    // Return empty initially; loadMilestones will be called with projectId
     return [];
   }
 
@@ -87,7 +91,10 @@ class MilestoneController extends AsyncNotifier<List<Milestone>> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      await _repository.deleteMilestone(milestoneId);
+      await _repository.deleteMilestone(
+        milestoneId: milestoneId,
+        projectId: projectId,
+      );
 
       return _repository.getMilestones(projectId);
     });

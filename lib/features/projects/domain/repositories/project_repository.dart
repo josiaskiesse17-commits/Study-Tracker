@@ -3,8 +3,6 @@ import '../entities/project.dart';
 abstract class ProjectRepository {
   Future<List<Project>> getProjects();
 
-  Future<List<Project>> getCachedProjects();
-
   Future<Project> createProject({
     required String name,
     String? description,

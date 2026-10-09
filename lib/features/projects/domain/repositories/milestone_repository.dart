@@ -5,10 +5,6 @@ abstract class MilestoneRepository {
     String projectId,
   );
 
-  Future<List<Milestone>> getCachedMilestones(
-    String projectId,
-  );
-
   Future<Milestone> createMilestone({
     required String projectId,
     required String title,
@@ -26,7 +22,8 @@ abstract class MilestoneRepository {
     DateTime? dueDate,
   });
 
-  Future<void> deleteMilestone(
-    String milestoneId,
-  );
+  Future<void> deleteMilestone({
+    required String milestoneId,
+    required String projectId,
+  });
 }

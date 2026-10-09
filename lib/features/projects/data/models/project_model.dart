@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/project.dart';
 
 class ProjectModel extends Project {
@@ -11,29 +12,31 @@ class ProjectModel extends Project {
     required super.createdAt,
   });
 
-  factory ProjectModel.fromJson(Map<String, dynamic> json) {
+  factory ProjectModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data() ?? {};
     return ProjectModel(
-      id: json['id'] as String,
-      userId: json['user_id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      status: json['status'] as String? ?? 'planning',
-      deadline: json['deadline'] != null
-          ? DateTime.parse(json['deadline'] as String)
+      id: doc.id,
+      userId: data['userId'] as String? ?? '',
+      name: data['name'] as String? ?? '',
+      description: data['description'] as String?,
+      status: data['status'] as String? ?? 'planning',
+      deadline: data['deadline'] != null
+          ? DateTime.parse(data['deadline'] as String)
           : null,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
-      'user_id': userId,
+      'userId': userId,
       'name': name,
       'description': description,
       'status': status,
       'deadline': deadline?.toIso8601String().split('T').first,
-      'created_at': createdAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 }

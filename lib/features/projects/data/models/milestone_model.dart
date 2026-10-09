@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/milestone.dart';
 
 class MilestoneModel extends Milestone {
@@ -11,31 +12,31 @@ class MilestoneModel extends Milestone {
     required super.createdAt,
   });
 
-  factory MilestoneModel.fromJson(Map<String, dynamic> json) {
+  factory MilestoneModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
+    final data = doc.data() ?? {};
     return MilestoneModel(
-      id: json['id'] as String,
-      projectId: json['project_id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String?,
-      status: json['status'] as String? ?? 'pending',
-      dueDate: json['due_date'] != null
-          ? DateTime.parse(json['due_date'] as String)
+      id: doc.id,
+      projectId: data['projectId'] as String? ?? '',
+      title: data['title'] as String? ?? '',
+      description: data['description'] as String?,
+      status: data['status'] as String? ?? 'pending',
+      dueDate: data['dueDate'] != null
+          ? DateTime.parse(data['dueDate'] as String)
           : null,
-      createdAt: DateTime.parse(
-        json['created_at'] as String,
-      ),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
-      'project_id': projectId,
+      'projectId': projectId,
       'title': title,
       'description': description,
       'status': status,
-      'due_date': dueDate?.toIso8601String().split('T').first,
-      'created_at': createdAt.toIso8601String(),
+      'dueDate': dueDate?.toIso8601String().split('T').first,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 }

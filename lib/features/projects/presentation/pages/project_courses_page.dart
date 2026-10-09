@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../courses/presentation/providers/course_controller.dart';
+import '../providers/linked_course_controller.dart';
 
 class ProjectCoursesPage extends ConsumerStatefulWidget {
   final String projectId;
@@ -21,113 +21,175 @@ class ProjectCoursesPage extends ConsumerStatefulWidget {
 
 class _ProjectCoursesPageState
     extends ConsumerState<ProjectCoursesPage> {
-  final SupabaseClient _supabase = Supabase.instance.client;
-
-  Set<String> _linkedCourseIds = {};
-  bool _isLoadingLinks = true;
-
   @override
   void initState() {
     super.initState();
-    _loadLinkedCourses();
+    // Trigger loading of linked courses when the page opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(linkedCourseControllerProvider.notifier).loadLinkedCourses(widget.projectId);
+    });
   }
 
-  Future<void> _loadLinkedCourses() async {
-    try {
-      final rows = await _supabase
-          .from('project_courses')
-          .select('course_id')
-          .eq('project_id', widget.projectId);
+  @override
+  Widget build(BuildContext context) {
+    final coursesAsync = ref.watch(courseControllerProvider);
+    final linkedCoursesAsync = ref.watch(linkedCourseControllerProvider);
 
-      if (!mounted) return;
-
-      setState(() {
-        _linkedCourseIds = rows
-            .map<String>(
-              (row) => row['course_id'] as String,
-            )
-            .toSet();
-        _isLoadingLinks = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        _isLoadingLinks = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to load project courses: $e',
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Courses',
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
           ),
         ),
-      );
-    }
-  }
-
-  Future<void> _addCourse(String courseId) async {
-    try {
-      await _supabase.from('project_courses').insert({
-        'project_id': widget.projectId,
-        'course_id': courseId,
-      });
-
-      if (!mounted) return;
-
-      setState(() {
-        _linkedCourseIds = {
-          ..._linkedCourseIds,
-          courseId,
-        };
-      });
-
-      Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to add course: $e',
+      ),
+      body: coursesAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (error, stackTrace) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'Failed to load courses.\n\n$error',
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
-      );
-    }
-  }
+        data: (courses) {
+          return linkedCoursesAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            error: (error, stackTrace) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Failed to load project courses.\n\n$error',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            data: (linkedCourseIds) {
+              // Silently skip any linked course id whose course no longer exists
+              final linkedCourses = courses
+                  .where(
+                    (course) => linkedCourseIds.contains(course.id),
+                  )
+                  .toList();
 
-  Future<void> _removeCourse(String courseId) async {
-    try {
-      await _supabase
-          .from('project_courses')
-          .delete()
-          .eq('project_id', widget.projectId)
-          .eq('course_id', courseId);
+              if (linkedCourses.isEmpty) {
+                return _EmptyState(
+                  projectName: widget.projectName,
+                  onAddCourse: () {
+                    _showAddCourseSheet(courses, linkedCourseIds);
+                  },
+                );
+              }
 
-      if (!mounted) return;
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await ref
+                      .read(courseControllerProvider.notifier)
+                      .refreshCourses();
 
-      setState(() {
-        final updated = Set<String>.from(_linkedCourseIds);
-        updated.remove(courseId);
-        _linkedCourseIds = updated;
-      });
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to remove course: $e',
-          ),
+                  await ref
+                      .read(linkedCourseControllerProvider.notifier)
+                      .refreshLinkedCourses(widget.projectId);
+                },
+                child: ListView(
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    Text(
+                      widget.projectName,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Courses associated with this project',
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ...linkedCourses.map(
+                      (course) => Card(
+                        margin: const EdgeInsets.only(
+                          bottom: 12,
+                        ),
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.school_rounded,
+                          ),
+                          title: Text(
+                            course.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 6,
+                            ),
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${course.progress.toStringAsFixed(0)}% progress',
+                                ),
+                                const SizedBox(height: 8),
+                                LinearProgressIndicator(
+                                  value: (course.progress / 100)
+                                      .clamp(0.0, 1.0),
+                                ),
+                              ],
+                            ),
+                          ),
+                          isThreeLine: true,
+                          trailing: IconButton(
+                            tooltip: 'Remove course',
+                            icon: const Icon(
+                              Icons.link_off_rounded,
+                            ),
+                            onPressed: () {
+                              _removeCourse(course.id);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: coursesAsync.when(
+        data: (courses) => FloatingActionButton.extended(
+          onPressed: () {
+            _showAddCourseSheet(courses, linkedCoursesAsync.value ?? <String>{});
+          },
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('Add Course'),
         ),
-      );
-    }
+        loading: () => null,
+        error: (error, stackTrace) => null,
+      ),
+    );
   }
 
-  void _showAddCourseSheet(List courses) {
+  void _showAddCourseSheet(List courses, [Set<String> linkedCourseIds = const {}]) {
     final availableCourses = courses
         .where(
-          (course) => !_linkedCourseIds.contains(course.id),
+          (course) => !linkedCourseIds.contains(course.id),
         )
         .toList();
 
@@ -198,147 +260,46 @@ class _ProjectCoursesPageState
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final coursesAsync = ref.watch(courseControllerProvider);
+  Future<void> _addCourse(String courseId) async {
+    try {
+      await ref
+          .read(linkedCourseControllerProvider.notifier)
+          .linkCourse(widget.projectId, courseId);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Courses',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
+      if (!mounted) return;
+
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to add course: $e',
           ),
         ),
-      ),
-      body: coursesAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              'Failed to load courses.\n\n$error',
-              textAlign: TextAlign.center,
-            ),
+      );
+    }
+  }
+
+  Future<void> _removeCourse(String courseId) async {
+    try {
+      await ref
+          .read(linkedCourseControllerProvider.notifier)
+          .unlinkCourse(widget.projectId, courseId);
+
+      if (!mounted) return;
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to remove course: $e',
           ),
         ),
-        data: (courses) {
-          if (_isLoadingLinks) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          final linkedCourses = courses
-              .where(
-                (course) =>
-                    _linkedCourseIds.contains(course.id),
-              )
-              .toList();
-
-          if (linkedCourses.isEmpty) {
-            return _EmptyState(
-              projectName: widget.projectName,
-              onAddCourse: () {
-                _showAddCourseSheet(courses);
-              },
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              await ref
-                  .read(courseControllerProvider.notifier)
-                  .refreshCourses();
-
-              await _loadLinkedCourses();
-            },
-            child: ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                Text(
-                  widget.projectName,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Courses associated with this project',
-                  style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ...linkedCourses.map(
-                  (course) => Card(
-                    margin: const EdgeInsets.only(
-                      bottom: 12,
-                    ),
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.school_rounded,
-                      ),
-                      title: Text(
-                        course.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 6,
-                        ),
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${course.progress.toStringAsFixed(0)}% progress',
-                            ),
-                            const SizedBox(height: 8),
-                            LinearProgressIndicator(
-                              value: (course.progress / 100)
-                                  .clamp(0.0, 1.0),
-                            ),
-                          ],
-                        ),
-                      ),
-                      isThreeLine: true,
-                      trailing: IconButton(
-                        tooltip: 'Remove course',
-                        icon: const Icon(
-                          Icons.link_off_rounded,
-                        ),
-                        onPressed: () {
-                          _removeCourse(course.id);
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-      floatingActionButton: coursesAsync.when(
-        data: (courses) => FloatingActionButton.extended(
-          onPressed: () {
-            _showAddCourseSheet(courses);
-          },
-          icon: const Icon(Icons.add_rounded),
-          label: const Text('Add Course'),
-        ),
-        loading: () => null,
-        error: (error, stackTrace) => null,
-      ),
-    );
+      );
+    }
   }
 }
 

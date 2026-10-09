@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/auth_controller.dart';
 import '../../domain/entities/task.dart';
 import '../../domain/repositories/task_repository.dart';
 import 'task_provider.dart';
@@ -10,11 +11,12 @@ final taskControllerProvider =
 );
 
 class TaskController extends AsyncNotifier<List<WorkItem>> {
-  late final TaskRepository _repository;
+  TaskRepository get _repository => ref.read(taskRepositoryProvider);
 
   @override
   Future<List<WorkItem>> build() async {
-    _repository = ref.read(taskRepositoryProvider);
+    // Rebuilds automatically whenever the logged-in user changes.
+    ref.watch(authControllerProvider.select((s) => s.user?.id));
 
     return _repository.getTasks();
   }
