@@ -1,88 +1,75 @@
-import 'package:dio/dio.dart';
+import 'dart:async';
 
-import '../../../../core/network/network_exceptions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+
 import '../models/course_model.dart';
 
 class CourseRemoteDataSource {
-  final Dio dio;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  CourseRemoteDataSource(this.dio);
+  String _getUid() {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('You must be logged in to access courses.');
+    }
+    return user.uid;
+  }
+
+  CollectionReference<Map<String, dynamic>> _coursesCollection(String uid) {
+    return _firestore.collection('users').doc(uid).collection('courses');
+  }
 
   Future<List<CourseModel>> getCourses() async {
-    try {
-      final response = await dio.get(
-        'courses',
-        queryParameters: {
-          'select': '*',
-          'order': 'created_at.desc',
-        },
-      );
+    final uid = _getUid();
+    final snapshot = await _coursesCollection(uid)
+        .orderBy('createdAt', descending: true)
+        .get();
 
-      final data = response.data;
+    return snapshot.docs
+        .map((doc) => CourseModel.fromFirestore(doc))
+        .toList();
+  }
 
-      if (data is! List) {
-        throw const NetworkException(
-          'Invalid course data received from the server.',
-        );
-      }
+  Future<CourseModel> getCourse(String courseId) async {
+    final uid = _getUid();
+    final doc = await _coursesCollection(uid).doc(courseId).get();
 
-      return data
-          .map(
-            (json) => CourseModel.fromJson(
-              Map<String, dynamic>.from(json as Map),
-            ),
-          )
-          .toList();
-    } on DioException catch (error) {
-      throw mapDioException(error);
+    if (!doc.exists) {
+      throw Exception('Course not found');
     }
+
+    return CourseModel.fromFirestore(doc);
   }
 
   Future<CourseModel> createCourse({
-    required String userId,
     required String name,
     String? description,
     double progress = 0,
   }) async {
-    try {
-      final response = await dio.post(
-        'courses',
-        queryParameters: {
-          'select': '*',
-        },
-        options: Options(
-          headers: {
-            'Prefer': 'return=representation',
-          },
-        ),
-        data: {
-          'user_id': userId,
-          'name': name,
-          'description': description,
-          'progress': progress,
-        },
-      );
+    final uid = _getUid();
+    final docRef = _coursesCollection(uid).doc();
 
-      final data = response.data;
+    final course = CourseModel(
+      id: docRef.id,
+      userId: uid,
+      name: name,
+      description: description,
+      progress: progress,
+      createdAt: DateTime.now(),
+    );
 
-      if (data is List && data.isNotEmpty) {
-        return CourseModel.fromJson(
-          Map<String, dynamic>.from(data.first as Map),
-        );
-      }
+    // Not awaited on purpose: offline, the server acknowledgement only comes
+    // later, and waiting for it would freeze the UI.
+    unawaited(
+      docRef.set(course.toFirestore()).catchError((Object error) {
+        debugPrint('Error creating course: $error');
+      }),
+    );
 
-      if (data is Map) {
-        return CourseModel.fromJson(
-          Map<String, dynamic>.from(data),
-        );
-      }
-
-      throw const NetworkException(
-        'Invalid course data received from the server.',
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    return course;
   }
 
   Future<void> updateCourse({
@@ -91,33 +78,26 @@ class CourseRemoteDataSource {
     String? description,
     required double progress,
   }) async {
-    try {
-      await dio.patch(
-        'courses',
-        queryParameters: {
-          'id': 'eq.$courseId',
-        },
-        data: {
-          'name': name,
-          'description': description,
-          'progress': progress,
-        },
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    final uid = _getUid();
+
+    unawaited(
+      _coursesCollection(uid).doc(courseId).update({
+        'name': name,
+        'description': description,
+        'progress': progress,
+      }).catchError((Object error) {
+        debugPrint('Error updating course: $error');
+      }),
+    );
   }
 
   Future<void> deleteCourse(String courseId) async {
-    try {
-      await dio.delete(
-        'courses',
-        queryParameters: {
-          'id': 'eq.$courseId',
-        },
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    final uid = _getUid();
+
+    unawaited(
+      _coursesCollection(uid).doc(courseId).delete().catchError((Object error) {
+        debugPrint('Error deleting course: $error');
+      }),
+    );
   }
 }
