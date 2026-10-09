@@ -1,6 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'
-    show AuthException;
 
 import '../../domain/entities/user.dart';
 import '../../domain/usecases/login.dart';
@@ -127,11 +126,13 @@ class AuthController extends Notifier<AuthState> {
   }
 
   String _getErrorMessage(Object error) {
-    if (error is AuthException) {
-      return error.message;
+    if (error is firebase_auth.FirebaseAuthException) {
+      return error.message ?? 'Authentication failed. Please try again.';
     }
-
-    return error.toString().replaceFirst('Exception: ', '');
+    if (error is Exception) {
+      return error.toString().replaceFirst('Exception: ', '');
+    }
+    return error.toString();
   }
 }
 

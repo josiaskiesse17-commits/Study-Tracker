@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -7,15 +8,11 @@ class UserModel extends User {
     super.fullName,
   });
 
-  factory UserModel.fromSupabase(
-    String id,
-    String email,
-    Map<String, dynamic>? metadata,
-  ) {
+  factory UserModel.fromFirebase(firebase_auth.User user) {
     return UserModel(
-      id: id,
-      email: email,
-      fullName: metadata?['full_name'] as String?,
+      id: user.uid,
+      email: user.email ?? '',
+      fullName: user.displayName,
     );
   }
 }

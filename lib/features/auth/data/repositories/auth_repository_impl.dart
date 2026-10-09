@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
@@ -14,23 +15,22 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     String? fullName,
   }) async {
-    final response = await remoteDataSource.register(
-      email: email,
-      password: password,
-      fullName: fullName,
-    );
+    try {
+      final credential = await remoteDataSource.register(
+        email: email,
+        password: password,
+        fullName: fullName,
+      );
 
-    final user = response.user;
+      final user = credential.user;
+      if (user == null) {
+        throw Exception('Registration failed: no user returned.');
+      }
 
-    if (user == null) {
-      throw Exception('Registration failed: no user returned.');
+      return UserModel.fromFirebase(user);
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw _mapFirebaseAuthException(e);
     }
-
-    return UserModel.fromSupabase(
-      user.id,
-      user.email ?? email,
-      user.userMetadata,
-    );
   }
 
   @override
@@ -38,22 +38,21 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    final response = await remoteDataSource.login(
-      email: email,
-      password: password,
-    );
+    try {
+      final credential = await remoteDataSource.login(
+        email: email,
+        password: password,
+      );
 
-    final user = response.user;
+      final user = credential.user;
+      if (user == null) {
+        throw Exception('Login failed: no user returned.');
+      }
 
-    if (user == null) {
-      throw Exception('Login failed: no user returned.');
+      return UserModel.fromFirebase(user);
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      throw _mapFirebaseAuthException(e);
     }
-
-    return UserModel.fromSupabase(
-      user.id,
-      user.email ?? email,
-      user.userMetadata,
-    );
   }
 
   @override
@@ -63,16 +62,33 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   User? getCurrentUser() {
-    final user = remoteDataSource.getCurrentSupabaseUser();
-
+    final user = remoteDataSource.getCurrentUser();
     if (user == null) {
       return null;
     }
+    return UserModel.fromFirebase(user);
+  }
 
-    return UserModel.fromSupabase(
-      user.id,
-      user.email ?? '',
-      user.userMetadata,
-    );
+  Exception _mapFirebaseAuthException(firebase_auth.FirebaseAuthException e) {
+    switch (e.code) {
+      case 'email-already-in-use':
+        return Exception('An account already exists with this email.');
+      case 'invalid-credential':
+        return Exception('Invalid credentials. Please check your email and password.');
+      case 'wrong-password':
+        return Exception('Incorrect password. Please try again.');
+      case 'user-not-found':
+        return Exception('No account found with this email.');
+      case 'weak-password':
+        return Exception('Password is too weak. Please use at least 6 characters.');
+      case 'invalid-email':
+        return Exception('Invalid email address.');
+      case 'network-request-failed':
+        return Exception('Network error. Please check your connection.');
+      case 'too-many-requests':
+        return Exception('Too many attempts. Please try again later.');
+      default:
+        return Exception(e.message ?? 'Authentication failed. Please try again.');
+    }
   }
 }
