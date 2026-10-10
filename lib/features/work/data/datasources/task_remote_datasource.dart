@@ -1,45 +1,40 @@
-import 'package:dio/dio.dart';
+import 'dart:async';
 
-import '../../../../core/network/network_exceptions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/write_error_reporter.dart';
 import '../models/task_model.dart';
 
 class TaskRemoteDataSource {
-  final Dio dio;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  TaskRemoteDataSource(this.dio);
+  String _getUid() {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('You must be logged in to access work items.');
+    }
+    return user.uid;
+  }
+
+  CollectionReference<Map<String, dynamic>> _workItemsCollection(String uid) {
+    return _firestore.collection('users').doc(uid).collection('workItems');
+  }
 
   Future<List<TaskModel>> getTasks() async {
-    try {
-      final response = await dio.get(
-        'work_items',
-        queryParameters: {
-          'select': '*',
-          'order': 'created_at.desc',
-        },
-      );
+    final uid = _getUid();
+    final snapshot = await _workItemsCollection(uid)
+        .orderBy('createdAt', descending: true)
+        .get();
 
-      final data = response.data;
-
-      if (data is! List) {
-        throw const NetworkException(
-          'Invalid work item data received from the server.',
-        );
-      }
-
-      return data
-          .map(
-            (json) => TaskModel.fromJson(
-              Map<String, dynamic>.from(json as Map),
-            ),
-          )
-          .toList();
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    return snapshot.docs
+        .map((doc) => TaskModel.fromFirestore(doc))
+        .toList();
   }
 
   Future<TaskModel> createTask({
-    required String userId,
     required String title,
     String? description,
     String? courseId,
@@ -49,50 +44,33 @@ class TaskRemoteDataSource {
     String priority = 'medium',
     DateTime? dueDate,
   }) async {
-    try {
-      final response = await dio.post(
-        'work_items',
-        queryParameters: {
-          'select': '*',
-        },
-        options: Options(
-          headers: {
-            'Prefer': 'return=representation',
-          },
-        ),
-        data: {
-          'user_id': userId,
-          'title': title,
-          'description': description,
-          'course_id': courseId,
-          'project_id': projectId,
-          'type': type,
-          'status': status,
-          'priority': priority,
-          'due_date': dueDate?.toIso8601String().split('T').first,
-        },
-      );
+    final uid = _getUid();
+    final docRef = _workItemsCollection(uid).doc();
 
-      final data = response.data;
+    final task = TaskModel(
+      id: docRef.id,
+      userId: uid,
+      courseId: courseId,
+      projectId: projectId,
+      title: title,
+      description: description,
+      type: type,
+      status: status,
+      priority: priority,
+      dueDate: dueDate,
+      createdAt: DateTime.now(),
+    );
 
-      if (data is List && data.isNotEmpty) {
-        return TaskModel.fromJson(
-          Map<String, dynamic>.from(data.first as Map),
-        );
-      }
+    // Not awaited on purpose: offline, the server acknowledgement only comes
+    // later, and waiting for it would freeze the UI.
+    unawaited(
+      docRef.set(task.toFirestore()).catchError((Object error) {
+        debugPrint('Error creating work item: $error');
+        reportWriteError(error);
+      }),
+    );
 
-      if (data is Map) {
-        return TaskModel.fromJson(
-          Map<String, dynamic>.from(data),
-        );
-      }
-
-      throw const NetworkException(
-        'Invalid work item data received from the server.',
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    return task;
   }
 
   Future<void> updateTask({
@@ -106,38 +84,33 @@ class TaskRemoteDataSource {
     required String priority,
     DateTime? dueDate,
   }) async {
-    try {
-      await dio.patch(
-        'work_items',
-        queryParameters: {
-          'id': 'eq.$taskId',
-        },
-        data: {
-          'title': title,
-          'description': description,
-          'course_id': courseId,
-          'project_id': projectId,
-          'type': type,
-          'status': status,
-          'priority': priority,
-          'due_date': dueDate?.toIso8601String().split('T').first,
-        },
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    final uid = _getUid();
+
+    unawaited(
+      _workItemsCollection(uid).doc(taskId).update({
+        'title': title,
+        'description': description,
+        'courseId': courseId,
+        'projectId': projectId,
+        'type': type,
+        'status': status,
+        'priority': priority,
+        'dueDate': dueDate?.toIso8601String().split('T').first,
+      }).catchError((Object error) {
+        debugPrint('Error updating work item: $error');
+        reportWriteError(error);
+      }),
+    );
   }
 
   Future<void> deleteTask(String taskId) async {
-    try {
-      await dio.delete(
-        'work_items',
-        queryParameters: {
-          'id': 'eq.$taskId',
-        },
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    final uid = _getUid();
+
+    unawaited(
+      _workItemsCollection(uid).doc(taskId).delete().catchError((Object error) {
+        debugPrint('Error deleting work item: $error');
+        reportWriteError(error);
+      }),
+    );
   }
 }

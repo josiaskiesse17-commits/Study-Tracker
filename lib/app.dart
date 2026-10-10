@@ -3,7 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/theme_provider.dart';
+import 'core/write_error_reporter_provider.dart';
 import 'l10n/app_localizations.dart';
+
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 class App extends ConsumerWidget {
   const App({super.key});
@@ -12,12 +16,27 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
 
+    // Listen to write errors and show SnackBars
+    ref.listen(writeErrorReporterProvider, (previous, error) {
+      if (error.hasValue) {
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.writeErrorMessage,
+            ),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    });
+
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeModeNotifier,
       builder: (context, themeMode, child) {
         return MaterialApp.router(
           title: 'StudyTrack',
           debugShowCheckedModeBanner: false,
+          scaffoldMessengerKey: scaffoldMessengerKey,
 
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

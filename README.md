@@ -96,88 +96,71 @@ lib/
 
 ## APIs
 
-StudyTrack uses **Supabase** as its backend.
+StudyTrack uses **Firebase** as its backend.
 
-Supabase provides:
+Firebase provides:
 
-* Authentication
-* PostgreSQL database
-* REST API
-
-The REST API is accessed using **Dio**.
+* Authentication (Email/Password)
+* Cloud Firestore database
+* Built-in offline persistence
 
 ### Courses API
 
+Courses are stored in a Firestore subcollection: `users/{uid}/courses/{courseId}`
+
 ```text
-GET    /rest/v1/courses
-POST   /rest/v1/courses
-PATCH  /rest/v1/courses
-DELETE /rest/v1/courses
+GET    users/{uid}/courses
+POST   users/{uid}/courses
+PATCH  users/{uid}/courses/{courseId}
+DELETE users/{uid}/courses/{courseId}
 ```
 
 ### Work API
 
-Work items are stored in `work_items`:
+Work items are stored in a Firestore subcollection: `users/{uid}/workItems/{itemId}`
 
 ```text
-GET    /rest/v1/work_items
-POST   /rest/v1/work_items
-PATCH  /rest/v1/work_items
-DELETE /rest/v1/work_items
+GET    users/{uid}/workItems
+POST   users/{uid}/workItems
+PATCH  users/{uid}/workItems/{itemId}
+DELETE users/{uid}/workItems/{itemId}
 ```
 
 ### Projects API
 
 ```text
-GET    /rest/v1/projects
-POST   /rest/v1/projects
-PATCH  /rest/v1/projects
-DELETE /rest/v1/projects
+GET    users/{uid}/projects
+POST   users/{uid}/projects
+PATCH  users/{uid}/projects/{projectId}
+DELETE users/{uid}/projects/{projectId}
 ```
 
 ### Milestones API
 
-```text
-GET    /rest/v1/milestones
-POST   /rest/v1/milestones
-PATCH  /rest/v1/milestones
-DELETE /rest/v1/milestones
-```
-
-The REST API base URL is:
+Milestones are stored in a nested subcollection: `users/{uid}/projects/{projectId}/milestones/{milestoneId}`
 
 ```text
-SUPABASE_URL/rest/v1/
+GET    users/{uid}/projects/{projectId}/milestones
+POST   users/{uid}/projects/{projectId}/milestones
+PATCH  users/{uid}/projects/{projectId}/milestones/{milestoneId}
+DELETE users/{uid}/projects/{projectId}/milestones/{milestoneId}
 ```
 
 ### Authentication
 
-Supabase Auth is used for user registration and login.
+Firebase Auth is used for user registration and login.
 
-Authenticated API requests include the user's JWT access token:
+### Project Courses (links)
 
-```text
-Authorization: Bearer <access_token>
-```
-
-A Dio interceptor automatically adds the authorization header to requests.
-
-When an API request returns `401 Unauthorized`, the application attempts to refresh the Supabase session and retry the request using the new access token.
+Course-project links are stored in: `users/{uid}/projects/{projectId}/linkedCourses/{courseId}`
 
 ## Local Storage
 
-StudyTrack uses **SQLite (`sqflite`)** for local caching.
+StudyTrack uses **Cloud Firestore's built-in offline persistence** for local caching.
 
-The application caches:
+The application caches all user data (courses, work items, projects, milestones, project-course links) locally. When the device is offline, reads are served from the local cache, and writes are queued and synced automatically when connectivity is restored.
 
-* Courses
-* Work items
-* Projects
-* Milestones
-
-When the device is offline, previously cached data can be loaded from SQLite.
-
-Repositories determine whether data should be retrieved from the remote API or local storage.
+No manual SQLite caching or connectivity checks are needed — Firestore handles this transparently.
 
 ## Configuration
 
@@ -188,6 +171,7 @@ Make sure the following are installed:
 * Flutter
 * Dart
 * A configured Android or iOS development environment
+* Firebase CLI (`npm install -g firebase-tools`)
 
 ### 1. Install dependencies
 
@@ -195,40 +179,28 @@ Make sure the following are installed:
 flutter pub get
 ```
 
-### 2. Configure Supabase
+### 2. Configure Firebase
 
-Create a Supabase project and obtain:
+Create a Firebase project and enable:
 
-* Project URL
-* Publishable key
+* **Authentication** → Email/Password sign-in method
+* **Cloud Firestore** → Start in production mode
 
-### 3. Create the environment file
-
-Create a `.env` file in the project root:
+### 3. Configure the app with FlutterFire
 
 ```text
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+flutterfire configure
 ```
 
-Replace the values with the credentials from your Supabase project.
+This generates `lib/firebase_options.dart` with your project configuration.
 
-The `.env` file is loaded when the application starts.
-
-### 4. Configure the Supabase database
-
-The application requires:
+### 4. Deploy Firestore security rules
 
 ```text
-profiles
-courses
-work_items
-projects
-project_courses
-milestones
+firebase deploy --only firestore:rules
 ```
 
-Row Level Security (RLS) must be enabled so users can only access their own data and authorized project relationships.
+The rules in `firestore.rules` ensure users can only access their own data under `users/{uid}/...`.
 
 ### 5. Generate localization
 
@@ -250,12 +222,9 @@ flutter run
 | -------------------- | ------------------------------------- |
 | `flutter_riverpod`   | State management                      |
 | `go_router`          | Navigation                            |
-| `dio`                | HTTP requests                         |
-| `supabase_flutter`   | Supabase authentication and backend   |
-| `sqflite`            | SQLite local storage                  |
-| `connectivity_plus`  | Network connectivity detection        |
-| `flutter_dotenv`     | Environment configuration             |
-| `shared_preferences` | Local preferences and session storage |
+| `firebase_core`      | Firebase initialization               |
+| `firebase_auth`      | Firebase Authentication               |
+| `cloud_firestore`    | Cloud Firestore database              |
 | `mocktail`           | Testing                               |
 
 ## Testing

@@ -1,48 +1,43 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthRemoteDataSource {
-  final SupabaseClient supabase;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  AuthRemoteDataSource(this.supabase);
-
-Future<AuthResponse> register({
-  required String email,
-  required String password,
-  String? fullName,
-}) {
-  return supabase.auth.signUp(
-    email: email,
-    password: password,
-    data: {
-      'full_name': ?fullName,
-    },
-  );
-}
-
-  Future<AuthResponse> login({
+  Future<UserCredential> register({
     required String email,
     required String password,
-  }) {
-    return supabase.auth.signInWithPassword(
+    String? fullName,
+  }) async {
+    final credential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    if (fullName != null && fullName.trim().isNotEmpty) {
+      await credential.user?.updateDisplayName(fullName.trim());
+      await credential.user?.reload();
+    }
+    return credential;
+  }
+
+  Future<UserCredential> login({
+    required String email,
+    required String password,
+  }) async {
+    return await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
   }
 
-  Future<void> logout() {
-    return supabase.auth.signOut();
+  Future<void> logout() async {
+    await _auth.signOut();
   }
 
-  Session? getCurrentSession() {
-    return supabase.auth.currentSession;
+  User? getCurrentUser() {
+    return _auth.currentUser;
   }
 
-  User? getCurrentSupabaseUser() {
-    return supabase.auth.currentUser;
-  }
-
-  Future<Session?> refreshSession() async {
-    final response = await supabase.auth.refreshSession();
-    return response.session;
+  Stream<User?> authStateChanges() {
+    return _auth.authStateChanges();
   }
 }

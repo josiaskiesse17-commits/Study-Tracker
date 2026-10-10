@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/project.dart';
-import '../providers/project_controller.dart';
-import 'project_details_page.dart';
+import 'package:study_tracker/core/utils/date_format.dart';
+import 'package:study_tracker/core/widgets/error_state.dart';
+import 'package:study_tracker/features/work/presentation/widgets/work_labels.dart';
+import 'package:study_tracker/l10n/app_localizations.dart';
+import 'package:study_tracker/features/projects/domain/entities/project.dart';
+import 'package:study_tracker/features/projects/presentation/providers/project_controller.dart';
+import 'package:study_tracker/features/projects/presentation/pages/project_details_page.dart';
 
 class ProjectsPage extends ConsumerWidget {
   const ProjectsPage({super.key});
@@ -25,39 +28,14 @@ class ProjectsPage extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(),
         ),
-        error: (error, stackTrace) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.error_outline_rounded,
-                  size: 48,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.unableToLoadProjects,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: () {
-                    ref
-                        .read(projectControllerProvider.notifier)
-                        .refreshProjects();
-                  },
-                  child: Text(l10n.retry),
-                ),
-              ],
-            ),
-          ),
+        error: (error, stackTrace) => ErrorState(
+          message: l10n.unableToLoadProjects,
+          error: error.toString(),
+          onRetry: () {
+            ref
+                .read(projectControllerProvider.notifier)
+                .refreshProjects();
+          },
         ),
         data: (projects) {
           if (projects.isEmpty) {
@@ -227,7 +205,7 @@ class ProjectsPage extends ConsumerWidget {
                         subtitle: Text(
                           deadline == null
                               ? l10n.noDeadline
-                              : _formatDate(deadline!),
+                              : formatDate(deadline!),
                         ),
                         trailing: deadline == null
                             ? const Icon(
@@ -374,12 +352,6 @@ class ProjectsPage extends ConsumerWidget {
         .read(projectControllerProvider.notifier)
         .deleteProject(project.id);
   }
-
-  static String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/'
-        '${date.year}';
-  }
 }
 
 class _EmptyProjects extends StatelessWidget {
@@ -511,7 +483,16 @@ class _ProjectCard extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _StatusChip(status: project.status),
+                  Chip(
+                    avatar: Icon(
+                      project.status == 'completed'
+                          ? Icons.check_circle_rounded
+                          : Icons.pending_rounded,
+                      size: 17,
+                    ),
+                    label: Text(projectStatusLabel(context, project.status)),
+                    backgroundColor: colors.primaryContainer,
+                  ),
                   if (project.deadline != null)
                     Chip(
                       avatar: const Icon(
@@ -519,7 +500,7 @@ class _ProjectCard extends StatelessWidget {
                         size: 16,
                       ),
                       label: Text(
-                        _formatDate(project.deadline!),
+                        formatDate(project.deadline!),
                       ),
                     ),
                 ],
@@ -528,44 +509,6 @@ class _ProjectCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  static String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/'
-        '${date.year}';
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  final String status;
-
-  const _StatusChip({
-    required this.status,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context)!;
-
-    final label = switch (status) {
-      'planning' => l10n.planning,
-      'in_progress' => l10n.inProgress,
-      'completed' => l10n.completed,
-      _ => status,
-    };
-
-    return Chip(
-      avatar: Icon(
-        status == 'completed'
-            ? Icons.check_circle_rounded
-            : Icons.pending_rounded,
-        size: 17,
-      ),
-      label: Text(label),
-      backgroundColor: colors.primaryContainer,
     );
   }
 }

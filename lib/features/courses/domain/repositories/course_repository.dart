@@ -3,8 +3,6 @@ import '../entities/course.dart';
 abstract class CourseRepository {
   Future<List<Course>> getCourses();
 
-  Future<List<Course>> getCachedCourses();
-
   Future<Course> createCourse({
     required String name,
     String? description,

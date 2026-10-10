@@ -150,5 +150,31 @@
   },
   "noProjectsYet": "Aucun projet pour le moment",
   "createProjectDescription": "Créez un projet pour organiser un travail plus important.",
-  "projectActions": "Actions du projet"
+  "projectActions": "Actions du projet",
+
+  "projectDetails": "Détails du projet",
+  "projectContent": "Contenu du projet",
+  "milestones": "Jalons",
+  "coursesAssociated": "Cours associés à ce projet",
+  "workAssociated": "Travail associé à ce projet",
+  "noDeadline": "Aucune échéance",
+
+  "milestone": "Jalon",
+  "newMilestone": "Nouveau jalon",
+  "editMilestone": "Modifier le jalon",
+  "deleteMilestone": "Supprimer le jalon ?",
+  "deleteMilestoneConfirmation": "Supprimer « {title} » ? Cette action est irréversible.",
+  "@deleteMilestoneConfirmation": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "noMilestonesYet": "Aucun jalon pour le moment",
+  "createMilestoneDescription": "Divisez ce projet en objectifs plus petits.",
+  "noDueDate": "Aucune date d'échéance",
+  "chooseDueDate": "Choisir la date d'échéance",
+
+  "couldNotLoadMilestones": "Impossible de charger les jalons.",
+  "couldNotLoadProjectDetails": "Impossible de charger les détails du projet.",
+  "writeErrorMessage": "Impossible d'enregistrer votre dernière modification. Veuillez réessayer."
 }

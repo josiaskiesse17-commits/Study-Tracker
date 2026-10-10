@@ -1,9 +1,6 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:study_tracker/features/work/data/datasources/task_local_datasource.dart';
 import 'package:study_tracker/features/work/data/datasources/task_remote_datasource.dart';
 import 'package:study_tracker/features/work/data/models/task_model.dart';
 import 'package:study_tracker/features/work/data/repositories/task_repository_impl.dart';
@@ -11,23 +8,8 @@ import 'package:study_tracker/features/work/data/repositories/task_repository_im
 class MockTaskRemoteDataSource extends Mock
     implements TaskRemoteDataSource {}
 
-class MockTaskLocalDataSource extends Mock
-    implements TaskLocalDataSource {}
-
-class MockConnectivity extends Mock implements Connectivity {}
-
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-class MockGoTrueClient extends Mock implements GoTrueClient {}
-
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   late MockTaskRemoteDataSource remoteDataSource;
-  late MockTaskLocalDataSource localDataSource;
-  late MockConnectivity connectivity;
-  late MockSupabaseClient supabase;
-  late MockGoTrueClient auth;
   late TaskRepositoryImpl repository;
 
   const userId = 'user-123';
@@ -48,43 +30,38 @@ void main() {
 
   setUp(() {
     remoteDataSource = MockTaskRemoteDataSource();
-    localDataSource = MockTaskLocalDataSource();
-    connectivity = MockConnectivity();
-    supabase = MockSupabaseClient();
-    auth = MockGoTrueClient();
 
-    when(() => supabase.auth).thenReturn(auth);
-
-    when(() => auth.currentUser).thenReturn(
-      User(
-        id: userId,
-        appMetadata: {},
-        userMetadata: {},
-        aud: 'authenticated',
-        createdAt: DateTime.now().toIso8601String(),
-      ),
-    );
-
-    repository = TaskRepositoryImpl(
-      remoteDataSource: remoteDataSource,
-      localDataSource: localDataSource,
-      connectivity: connectivity,
-      supabase: supabase,
-    );
+    repository = TaskRepositoryImpl(remoteDataSource);
   });
 
   test(
-    'getCachedTasks returns work items from local datasource',
+    'getTasks returns work items from remote data source',
     () async {
-      when(() => localDataSource.getTasks(userId))
+      when(() => remoteDataSource.getTasks())
           .thenAnswer((_) async => [workItem]);
 
-      final result = await repository.getCachedTasks();
+      final result = await repository.getTasks();
 
       expect(result, [workItem]);
 
       verify(
-        () => localDataSource.getTasks(userId),
+        () => remoteDataSource.getTasks(),
+      ).called(1);
+    },
+  );
+
+  test(
+    'getTasks returns an empty list when no work items',
+    () async {
+      when(() => remoteDataSource.getTasks())
+          .thenAnswer((_) async => []);
+
+      final result = await repository.getTasks();
+
+      expect(result, isEmpty);
+
+      verify(
+        () => remoteDataSource.getTasks(),
       ).called(1);
     },
   );

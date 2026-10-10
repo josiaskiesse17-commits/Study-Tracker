@@ -3,8 +3,6 @@ import '../entities/task.dart';
 abstract class TaskRepository {
   Future<List<WorkItem>> getTasks();
 
-  Future<List<WorkItem>> getCachedTasks();
-
   Future<WorkItem> createTask({
     required String title,
     String? description,

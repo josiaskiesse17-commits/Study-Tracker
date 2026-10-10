@@ -1,0 +1,26 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "study-tracker-1e24a",
+          "appId": "1:344894967435:android:209a27a925f5a1d1d00e8e",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "study-tracker-1e24a",
+          "configurations": {
+            "android": "1:344894967435:android:209a27a925f5a1d1d00e8e",
+            "web": "1:344894967435:web:29ec8965eb867396d00e8e",
+            "windows": "1:344894967435:web:f2f544b6adef95fdd00e8e"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}}

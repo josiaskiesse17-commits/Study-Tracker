@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/entities/milestone.dart';
-import '../providers/milestone_controller.dart';
+import 'package:study_tracker/core/utils/date_format.dart';
+import 'package:study_tracker/core/widgets/error_state.dart';
+import 'package:study_tracker/features/work/presentation/widgets/work_labels.dart';
+import 'package:study_tracker/l10n/app_localizations.dart';
+import 'package:study_tracker/features/projects/domain/entities/milestone.dart';
+import 'package:study_tracker/features/projects/presentation/providers/milestone_controller.dart';
 
 class MilestonesPage extends ConsumerStatefulWidget {
   final String projectId;
@@ -31,17 +35,6 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
     );
   }
 
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'in_progress':
-        return 'In progress';
-      case 'completed':
-        return 'Completed';
-      default:
-        return 'Pending';
-    }
-  }
-
   Color _statusColor(BuildContext context, String status) {
     final colors = Theme.of(context).colorScheme;
 
@@ -55,19 +48,11 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
     }
   }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) {
-      return 'No due date';
-    }
-
-    return '${date.day.toString().padLeft(2, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/'
-        '${date.year}';
-  }
-
   Future<void> _showMilestoneDialog({
     Milestone? milestone,
   }) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final titleController = TextEditingController(
       text: milestone?.title ?? '',
     );
@@ -87,8 +72,8 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
             return AlertDialog(
               title: Text(
                 milestone == null
-                    ? 'New milestone'
-                    : 'Edit milestone',
+                    ? l10n.newMilestone
+                    : l10n.editMilestone,
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -97,8 +82,8 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
                     TextField(
                       controller: titleController,
                       textInputAction: TextInputAction.next,
-                      decoration: const InputDecoration(
-                        labelText: 'Title',
+                      decoration: InputDecoration(
+                        labelText: l10n.title,
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -106,30 +91,30 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
                     TextField(
                       controller: descriptionController,
                       maxLines: 3,
-                      decoration: const InputDecoration(
-                        labelText: 'Description',
+                      decoration: InputDecoration(
+                        labelText: l10n.description,
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 14),
                     DropdownButtonFormField<String>(
                       initialValue: status,
-                      decoration: const InputDecoration(
-                        labelText: 'Status',
+                      decoration: InputDecoration(
+                        labelText: l10n.status,
                         border: OutlineInputBorder(),
                       ),
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'pending',
-                          child: Text('Pending'),
+                          child: Text(l10n.pending),
                         ),
                         DropdownMenuItem(
                           value: 'in_progress',
-                          child: Text('In progress'),
+                          child: Text(l10n.inProgress),
                         ),
                         DropdownMenuItem(
                           value: 'completed',
-                          child: Text('Completed'),
+                          child: Text(l10n.completed),
                         ),
                       ],
                       onChanged: (value) {
@@ -146,12 +131,14 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
                       leading: const Icon(
                         Icons.calendar_today_rounded,
                       ),
-                      title: const Text('Due date'),
+                      title: Text(l10n.dueDate),
                       subtitle: Text(
-                        _formatDate(dueDate),
+                        dueDate == null
+                            ? l10n.noDueDate
+                            : formatDate(dueDate!),
                       ),
                       trailing: IconButton(
-                        tooltip: 'Choose due date',
+                        tooltip: l10n.chooseDueDate,
                         icon: const Icon(
                           Icons.edit_calendar_rounded,
                         ),
@@ -183,7 +170,7 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
                       false,
                     );
                   },
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () {
@@ -197,7 +184,7 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
                     );
                   },
                   child: Text(
-                    milestone == null ? 'Create' : 'Save',
+                    milestone == null ? l10n.create : l10n.save,
                   ),
                 ),
               ],
@@ -247,27 +234,28 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
   Future<void> _deleteMilestone(
     Milestone milestone,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete milestone?'),
+          title: Text(l10n.deleteMilestone),
           content: Text(
-            'Delete "${milestone.title}"? '
-            'This cannot be undone.',
+            l10n.deleteMilestoneConfirmation(milestone.title),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context, false);
               },
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () {
                 Navigator.pop(context, true);
               },
-              child: const Text('Delete'),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -292,6 +280,7 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
   ) {
     final statusColor =
         _statusColor(context, milestone.status);
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       child: ListTile(
@@ -322,8 +311,8 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
             ],
             const SizedBox(height: 6),
             Text(
-              '${_statusLabel(milestone.status)} • '
-              '${_formatDate(milestone.dueDate)}',
+              '${workStatusLabel(context, milestone.status)} • '
+              '${milestone.dueDate == null ? l10n.noDueDate : formatDate(milestone.dueDate!)}',
             ),
           ],
         ),
@@ -334,7 +323,7 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              tooltip: 'Edit milestone',
+              tooltip: l10n.edit,
               icon: const Icon(Icons.edit_rounded),
               onPressed: () {
                 _showMilestoneDialog(
@@ -343,7 +332,7 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
               },
             ),
             IconButton(
-              tooltip: 'Delete milestone',
+              tooltip: l10n.delete,
               icon: const Icon(
                 Icons.delete_outline_rounded,
               ),
@@ -361,6 +350,7 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
   Widget build(BuildContext context) {
     final milestonesState =
         ref.watch(milestoneControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -374,65 +364,45 @@ class _MilestonesPageState extends ConsumerState<MilestonesPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showMilestoneDialog(),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Milestone'),
+        label: Text(l10n.milestone),
       ),
       body: milestonesState.when(
         loading: () => const Center(
           child: CircularProgressIndicator(),
         ),
 
-        error: (error, stackTrace) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.error_outline_rounded,
-                  size: 48,
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Could not load milestones.',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: () => ref
-                      .read(
-                        milestoneControllerProvider.notifier,
-                      )
-                      .refreshMilestones(widget.projectId),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
+        error: (error, stackTrace) => ErrorState(
+          message: l10n.couldNotLoadMilestones,
+          error: error.toString(),
+          onRetry: () => ref
+              .read(milestoneControllerProvider.notifier)
+              .refreshMilestones(widget.projectId),
         ),
 
         data: (milestones) {
           if (milestones.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       Icons.flag_circle_outlined,
                       size: 56,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
-                      'No milestones yet',
-                      style: TextStyle(
+                      l10n.noMilestonesYet,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Break this project into smaller goals.',
+                      l10n.createMilestoneDescription,
                       textAlign: TextAlign.center,
                     ),
                   ],

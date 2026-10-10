@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/auth_controller.dart';
 import '../../domain/entities/project.dart';
 import '../../domain/repositories/project_repository.dart';
 import 'project_provider.dart';
@@ -10,11 +11,13 @@ final projectControllerProvider =
 );
 
 class ProjectController extends AsyncNotifier<List<Project>> {
-  late final ProjectRepository _repository;
+  ProjectRepository get _repository => ref.read(projectRepositoryProvider);
 
   @override
   Future<List<Project>> build() async {
-    _repository = ref.read(projectRepositoryProvider);
+    // Watch the current user ID so the list reloads when the logged-in user changes
+    ref.watch(authControllerProvider.select((s) => s.user?.id));
+
     return _repository.getProjects();
   }
 

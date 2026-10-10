@@ -348,4 +348,42 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get projectActions => 'Actions du projet';
+
+  @override
+  String get milestone => 'Jalon';
+
+  @override
+  String get newMilestone => 'Nouveau jalon';
+
+  @override
+  String get editMilestone => 'Modifier le jalon';
+
+  @override
+  String get deleteMilestone => 'Supprimer le jalon ?';
+
+  @override
+  String deleteMilestoneConfirmation(Object title) {
+    return 'Supprimer « $title » ? Cette action est irréversible.';
+  }
+
+  @override
+  String get noMilestonesYet => 'Aucun jalon pour le moment';
+
+  @override
+  String get createMilestoneDescription => 'Divisez ce projet en objectifs plus petits.';
+
+  @override
+  String get noDueDate => 'Aucune date d\'échéance';
+
+  @override
+  String get chooseDueDate => 'Choisir la date d\'échéance';
+
+  @override
+  String get couldNotLoadMilestones => 'Impossible de charger les jalons.';
+
+  @override
+  String get couldNotLoadProjectDetails => 'Impossible de charger les détails du projet.';
+
+  @override
+  String get writeErrorMessage => 'Impossible d\'enregistrer votre dernière modification. Veuillez réessayer.';
 }

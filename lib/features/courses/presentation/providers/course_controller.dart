@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/auth_controller.dart';
 import '../../domain/entities/course.dart';
 import '../../domain/usecases/get_courses.dart';
 import 'course_provider.dart';
@@ -13,6 +14,9 @@ class CourseController extends AsyncNotifier<List<Course>> {
 
   @override
   Future<List<Course>> build() async {
+    // Rebuilds automatically whenever the logged-in user changes.
+    ref.watch(authControllerProvider.select((s) => s.user?.id));
+
     return _getCourses();
   }
 

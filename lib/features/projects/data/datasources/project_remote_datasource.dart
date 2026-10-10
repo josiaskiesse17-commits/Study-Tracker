@@ -1,86 +1,68 @@
-import 'package:dio/dio.dart';
+import 'dart:async';
 
-import '../../../../core/network/network_exceptions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+
+import '../../../../core/write_error_reporter.dart';
 import '../models/project_model.dart';
 
 class ProjectRemoteDataSource {
-  final Dio dio;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  ProjectRemoteDataSource(this.dio);
+  String _getUid() {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('You must be logged in to access projects.');
+    }
+    return user.uid;
+  }
+
+  CollectionReference<Map<String, dynamic>> _projectsCollection(String uid) {
+    return _firestore.collection('users').doc(uid).collection('projects');
+  }
 
   Future<List<ProjectModel>> getProjects() async {
-    try {
-      final response = await dio.get(
-        'projects',
-        queryParameters: {
-          'select': '*',
-          'order': 'created_at.desc',
-        },
-      );
+    final uid = _getUid();
+    final snapshot = await _projectsCollection(uid)
+        .orderBy('createdAt', descending: true)
+        .get();
 
-      final data = response.data;
-
-      if (data is! List) {
-        throw const NetworkException(
-          'Invalid project data received from the server.',
-        );
-      }
-
-      return data
-          .map(
-            (json) => ProjectModel.fromJson(
-              Map<String, dynamic>.from(json as Map),
-            ),
-          )
-          .toList();
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    return snapshot.docs
+        .map((doc) => ProjectModel.fromFirestore(doc))
+        .toList();
   }
 
   Future<ProjectModel> createProject({
-    required String userId,
     required String name,
     String? description,
     String status = 'planning',
     DateTime? deadline,
   }) async {
-    try {
-      final response = await dio.post(
-        'projects',
-        queryParameters: {'select': '*'},
-        options: Options(
-          headers: {'Prefer': 'return=representation'},
-        ),
-        data: {
-          'user_id': userId,
-          'name': name,
-          'description': description,
-          'status': status,
-          'deadline': deadline?.toIso8601String().split('T').first,
-        },
-      );
+    final uid = _getUid();
+    final docRef = _projectsCollection(uid).doc();
 
-      final data = response.data;
+    final project = ProjectModel(
+      id: docRef.id,
+      userId: uid,
+      name: name,
+      description: description,
+      status: status,
+      deadline: deadline,
+      createdAt: DateTime.now(),
+    );
 
-      if (data is List && data.isNotEmpty) {
-        return ProjectModel.fromJson(
-          Map<String, dynamic>.from(data.first as Map),
-        );
-      }
+    // Not awaited on purpose: offline, the server acknowledgement only comes
+    // later, and waiting for it would freeze the UI.
+    unawaited(
+      docRef.set(project.toFirestore()).catchError((Object error) {
+        debugPrint('Error creating project: $error');
+        reportWriteError(error);
+      }),
+    );
 
-      if (data is Map) {
-        return ProjectModel.fromJson(
-          Map<String, dynamic>.from(data),
-        );
-      }
-
-      throw const NetworkException(
-        'Invalid project data received from the server.',
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
-    }
+    return project;
   }
 
   Future<void> updateProject({
@@ -90,34 +72,85 @@ class ProjectRemoteDataSource {
     required String status,
     DateTime? deadline,
   }) async {
+    final uid = _getUid();
+
+    unawaited(
+      _projectsCollection(uid).doc(projectId).update({
+        'name': name,
+        'description': description,
+        'status': status,
+        'deadline': deadline?.toIso8601String().split('T').first,
+      }).catchError((Object error) {
+        debugPrint('Error updating project: $error');
+        reportWriteError(error);
+      }),
+    );
+  }
+
+  /// Reads a query for the delete cleanup without ever throwing or hanging:
+  /// server first (4 s timeout), then the local cache, otherwise null.
+  Future<QuerySnapshot<Map<String, dynamic>>?> _tryGet(
+    Query<Map<String, dynamic>> query,
+  ) async {
     try {
-      await dio.patch(
-        'projects',
-        queryParameters: {
-          'id': 'eq.$projectId',
-        },
-        data: {
-          'name': name,
-          'description': description,
-          'status': status,
-          'deadline': deadline?.toIso8601String().split('T').first,
-        },
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
+      return await query.get().timeout(const Duration(seconds: 4));
+    } catch (_) {
+      try {
+        return await query.get(const GetOptions(source: Source.cache));
+      } catch (error) {
+        debugPrint('Could not read data for project cleanup: $error');
+        return null;
+      }
     }
   }
 
   Future<void> deleteProject(String projectId) async {
-    try {
-      await dio.delete(
-        'projects',
-        queryParameters: {
-          'id': 'eq.$projectId',
-        },
-      );
-    } on DioException catch (error) {
-      throw mapDioException(error);
+    final uid = _getUid();
+    final projectRef = _projectsCollection(uid).doc(projectId);
+
+    final batch = _firestore.batch();
+
+    // Milestones live in a subcollection, which Firestore does not delete
+    // automatically with the project.
+    final milestonesSnapshot = await _tryGet(projectRef.collection('milestones'));
+    if (milestonesSnapshot != null) {
+      for (final doc in milestonesSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
     }
+
+    // Linked courses live in a subcollection.
+    final linkedCoursesSnapshot = await _tryGet(projectRef.collection('linkedCourses'));
+    if (linkedCoursesSnapshot != null) {
+      for (final doc in linkedCoursesSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+    }
+
+    // Keep the project's work items, but detach them from the deleted project.
+    final workItemsSnapshot = await _tryGet(
+      _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('workItems')
+          .where('projectId', isEqualTo: projectId),
+    );
+    if (workItemsSnapshot != null) {
+      for (final doc in workItemsSnapshot.docs) {
+        batch.update(doc.reference, {'projectId': FieldValue.delete()});
+      }
+    }
+
+    // The project itself is always deleted, even if the cleanup reads failed.
+    batch.delete(projectRef);
+
+    // Not awaited on purpose: offline, the server acknowledgement only comes
+    // later, and waiting for it would freeze the UI.
+    unawaited(
+      batch.commit().catchError((Object error) {
+        debugPrint('Error deleting project and cleaning up: $error');
+        reportWriteError(error);
+      }),
+    );
   }
 }
