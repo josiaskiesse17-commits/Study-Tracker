@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/write_error_reporter.dart';
 import '../models/task_model.dart';
 
 class TaskRemoteDataSource {
@@ -65,6 +66,7 @@ class TaskRemoteDataSource {
     unawaited(
       docRef.set(task.toFirestore()).catchError((Object error) {
         debugPrint('Error creating work item: $error');
+        reportWriteError(error);
       }),
     );
 
@@ -96,6 +98,7 @@ class TaskRemoteDataSource {
         'dueDate': dueDate?.toIso8601String().split('T').first,
       }).catchError((Object error) {
         debugPrint('Error updating work item: $error');
+        reportWriteError(error);
       }),
     );
   }
@@ -106,6 +109,7 @@ class TaskRemoteDataSource {
     unawaited(
       _workItemsCollection(uid).doc(taskId).delete().catchError((Object error) {
         debugPrint('Error deleting work item: $error');
+        reportWriteError(error);
       }),
     );
   }

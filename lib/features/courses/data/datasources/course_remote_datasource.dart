@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/write_error_reporter.dart';
 import '../models/course_model.dart';
 
 class CourseRemoteDataSource {
@@ -66,6 +67,7 @@ class CourseRemoteDataSource {
     unawaited(
       docRef.set(course.toFirestore()).catchError((Object error) {
         debugPrint('Error creating course: $error');
+        reportWriteError(error);
       }),
     );
 
@@ -87,6 +89,7 @@ class CourseRemoteDataSource {
         'progress': progress,
       }).catchError((Object error) {
         debugPrint('Error updating course: $error');
+        reportWriteError(error);
       }),
     );
   }
@@ -97,6 +100,7 @@ class CourseRemoteDataSource {
     unawaited(
       _coursesCollection(uid).doc(courseId).delete().catchError((Object error) {
         debugPrint('Error deleting course: $error');
+        reportWriteError(error);
       }),
     );
   }

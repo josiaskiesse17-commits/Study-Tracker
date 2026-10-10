@@ -150,5 +150,31 @@
   },
   "noProjectsYet": "No projects yet",
   "createProjectDescription": "Create a project to organize a larger piece of work.",
-  "projectActions": "Project actions"
+  "projectActions": "Project actions",
+
+  "projectDetails": "Project Details",
+  "projectContent": "Project content",
+  "milestones": "Milestones",
+  "coursesAssociated": "Courses associated with this project",
+  "workAssociated": "Work associated with this project",
+  "noDeadline": "No deadline",
+
+  "milestone": "Milestone",
+  "newMilestone": "New milestone",
+  "editMilestone": "Edit milestone",
+  "deleteMilestone": "Delete milestone?",
+  "deleteMilestoneConfirmation": "Delete \"{title}\"? This cannot be undone.",
+  "@deleteMilestoneConfirmation": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "noMilestonesYet": "No milestones yet",
+  "createMilestoneDescription": "Break this project into smaller goals.",
+  "noDueDate": "No due date",
+  "chooseDueDate": "Choose due date",
+
+  "couldNotLoadMilestones": "Could not load milestones.",
+  "couldNotLoadProjectDetails": "Could not load project details.",
+  "writeErrorMessage": "Couldn't save your last change. Please try again."
 }

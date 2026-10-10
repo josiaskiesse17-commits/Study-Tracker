@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/write_error_reporter.dart';
 import '../models/project_model.dart';
 
 class ProjectRemoteDataSource {
@@ -57,6 +58,7 @@ class ProjectRemoteDataSource {
     unawaited(
       docRef.set(project.toFirestore()).catchError((Object error) {
         debugPrint('Error creating project: $error');
+        reportWriteError(error);
       }),
     );
 
@@ -80,6 +82,7 @@ class ProjectRemoteDataSource {
         'deadline': deadline?.toIso8601String().split('T').first,
       }).catchError((Object error) {
         debugPrint('Error updating project: $error');
+        reportWriteError(error);
       }),
     );
   }
@@ -146,6 +149,7 @@ class ProjectRemoteDataSource {
     unawaited(
       batch.commit().catchError((Object error) {
         debugPrint('Error deleting project and cleaning up: $error');
+        reportWriteError(error);
       }),
     );
   }

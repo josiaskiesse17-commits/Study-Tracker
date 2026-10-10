@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/write_error_reporter.dart';
 import '../models/linked_course_model.dart';
 
 class LinkedCourseRemoteDataSource {
@@ -52,6 +53,7 @@ class LinkedCourseRemoteDataSource {
         'linkedAt': Timestamp.fromDate(DateTime.now()),
       }).catchError((Object error) {
         debugPrint('Error linking course: $error');
+        reportWriteError(error);
       }),
     );
   }
@@ -67,6 +69,7 @@ class LinkedCourseRemoteDataSource {
           .delete()
           .catchError((Object error) {
         debugPrint('Error unlinking course: $error');
+        reportWriteError(error);
       }),
     );
   }

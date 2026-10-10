@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/write_error_reporter.dart';
 import '../models/milestone_model.dart';
 
 class MilestoneRemoteDataSource {
@@ -68,6 +69,7 @@ class MilestoneRemoteDataSource {
     unawaited(
       docRef.set(milestone.toFirestore()).catchError((Object error) {
         debugPrint('Error creating milestone: $error');
+        reportWriteError(error);
       }),
     );
 
@@ -92,6 +94,7 @@ class MilestoneRemoteDataSource {
         'dueDate': dueDate?.toIso8601String().split('T').first,
       }).catchError((Object error) {
         debugPrint('Error updating milestone: $error');
+        reportWriteError(error);
       }),
     );
   }
@@ -108,6 +111,7 @@ class MilestoneRemoteDataSource {
           .delete()
           .catchError((Object error) {
         debugPrint('Error deleting milestone: $error');
+        reportWriteError(error);
       }),
     );
   }

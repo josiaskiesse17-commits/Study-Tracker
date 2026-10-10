@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/entities/project.dart';
-import 'milestones_page.dart';
-import 'project_courses_page.dart';
-import 'project_work_page.dart';
+import 'package:study_tracker/core/utils/date_format.dart';
+import 'package:study_tracker/features/work/presentation/widgets/work_labels.dart';
+import 'package:study_tracker/l10n/app_localizations.dart';
+import 'package:study_tracker/features/projects/domain/entities/project.dart';
+import 'package:study_tracker/features/projects/presentation/pages/milestones_page.dart';
+import 'package:study_tracker/features/projects/presentation/pages/project_courses_page.dart';
+import 'package:study_tracker/features/projects/presentation/pages/project_work_page.dart';
 
-class ProjectDetailsPage extends StatelessWidget {
+class ProjectDetailsPage extends ConsumerWidget {
   final Project project;
 
   const ProjectDetailsPage({
     super.key,
     required this.project,
   });
-
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'in_progress':
-        return 'In progress';
-      case 'completed':
-        return 'Completed';
-      default:
-        return 'Planning';
-    }
-  }
 
   Color _statusColor(BuildContext context, String status) {
     final colors = Theme.of(context).colorScheme;
@@ -37,24 +30,17 @@ class ProjectDetailsPage extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'No deadline';
-
-    return '${date.day.toString().padLeft(2, '0')}/'
-        '${date.month.toString().padLeft(2, '0')}/'
-        '${date.year}';
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final statusColor = _statusColor(context, project.status);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Project Details',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.projectDetails,
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       body: SingleChildScrollView(
@@ -81,7 +67,7 @@ class ProjectDetailsPage extends StatelessWidget {
                   color: statusColor,
                 ),
                 label: Text(
-                  _statusLabel(project.status),
+                  projectStatusLabel(context, project.status),
                 ),
               ),
             ),
@@ -90,9 +76,9 @@ class ProjectDetailsPage extends StatelessWidget {
 
             if (project.description != null &&
                 project.description!.trim().isNotEmpty) ...[
-              const Text(
-                'Description',
-                style: TextStyle(
+              Text(
+                l10n.description,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                 ),
@@ -119,16 +105,18 @@ class ProjectDetailsPage extends StatelessWidget {
                   children: [
                     _InfoRow(
                       icon: Icons.flag_rounded,
-                      label: 'Status',
-                      value: _statusLabel(project.status),
+                      label: l10n.status,
+                      value: projectStatusLabel(context, project.status),
                     ),
 
                     const Divider(height: 28),
 
                     _InfoRow(
                       icon: Icons.calendar_today_rounded,
-                      label: 'Deadline',
-                      value: _formatDate(project.deadline),
+                      label: l10n.dueDate,
+                      value: project.deadline == null
+                          ? l10n.noDeadline
+                          : formatDate(project.deadline!),
                     ),
                   ],
                 ),
@@ -137,9 +125,9 @@ class ProjectDetailsPage extends StatelessWidget {
 
             const SizedBox(height: 28),
 
-            const Text(
-              'Project content',
-              style: TextStyle(
+            Text(
+              l10n.projectContent,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
               ),
@@ -153,14 +141,14 @@ class ProjectDetailsPage extends StatelessWidget {
                 leading: const Icon(
                   Icons.flag_circle_rounded,
                 ),
-                title: const Text(
-                  'Milestones',
-                  style: TextStyle(
+                title: Text(
+                  l10n.milestones,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                subtitle: const Text(
-                  'Break this project into smaller goals',
+                subtitle: Text(
+                  l10n.workAssociated,
                 ),
                 trailing: const Icon(
                   Icons.chevron_right_rounded,
@@ -185,14 +173,14 @@ class ProjectDetailsPage extends StatelessWidget {
                 leading: const Icon(
                   Icons.task_alt_rounded,
                 ),
-                title: const Text(
-                  'Work',
-                  style: TextStyle(
+                title: Text(
+                  l10n.work,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                subtitle: const Text(
-                  'Work associated with this project',
+                subtitle: Text(
+                  l10n.workAssociated,
                 ),
                 trailing: const Icon(
                   Icons.chevron_right_rounded,
@@ -217,14 +205,14 @@ class ProjectDetailsPage extends StatelessWidget {
                 leading: const Icon(
                   Icons.school_rounded,
                 ),
-                title: const Text(
-                  'Courses',
-                  style: TextStyle(
+                title: Text(
+                  l10n.coursesAssociated,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                subtitle: const Text(
-                  'Courses associated with this project',
+                subtitle: Text(
+                  l10n.coursesAssociated,
                 ),
                 trailing: const Icon(
                   Icons.chevron_right_rounded,

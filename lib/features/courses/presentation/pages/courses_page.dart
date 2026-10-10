@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/error_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../providers/course_controller.dart';
 
@@ -18,9 +19,7 @@ class CoursesPage extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           l10n.myCourses,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
           Padding(
@@ -36,16 +35,12 @@ class CoursesPage extends ConsumerWidget {
         ],
       ),
       body: coursesAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => _ErrorState(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => ErrorState(
           message: l10n.unableToLoadCourses,
           error: error.toString(),
           onRetry: () {
-            ref
-                .read(courseControllerProvider.notifier)
-                .refreshCourses();
+            ref.read(courseControllerProvider.notifier).refreshCourses();
           },
         ),
         data: (courses) {
@@ -60,11 +55,7 @@ class CoursesPage extends ConsumerWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   const SizedBox(height: 110),
-                  Icon(
-                    Icons.school_rounded,
-                    size: 72,
-                    color: colors.primary,
-                  ),
+                  Icon(Icons.school_rounded, size: 72, color: colors.primary),
                   const SizedBox(height: 20),
                   Center(
                     child: Text(
@@ -78,9 +69,7 @@ class CoursesPage extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
                         l10n.createFirstCourse,
                         textAlign: TextAlign.center,
@@ -93,9 +82,7 @@ class CoursesPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 28),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: FilledButton.icon(
                       onPressed: () {
                         _showCourseDialog(context, ref);
@@ -121,8 +108,7 @@ class CoursesPage extends ConsumerWidget {
               itemCount: courses.length,
               itemBuilder: (context, index) {
                 final course = courses[index];
-                final progress =
-                    (course.progress / 100).clamp(0.0, 1.0);
+                final progress = (course.progress / 100).clamp(0.0, 1.0);
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 14),
@@ -131,55 +117,45 @@ class CoursesPage extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(18),
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 width: 48,
                                 height: 48,
                                 decoration: BoxDecoration(
                                   color: colors.primaryContainer,
-                                  borderRadius:
-                                      BorderRadius.circular(15),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: Icon(
                                   Icons.school_rounded,
-                                  color:
-                                      colors.onPrimaryContainer,
+                                  color: colors.onPrimaryContainer,
                                 ),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       course.name,
                                       maxLines: 2,
-                                      overflow:
-                                          TextOverflow.ellipsis,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontSize: 17,
-                                        fontWeight:
-                                            FontWeight.w700,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
-                                    if (course.description !=
-                                        null) ...[
+                                    if (course.description != null) ...[
                                       const SizedBox(height: 5),
                                       Text(
                                         course.description!,
                                         maxLines: 2,
-                                        overflow:
-                                            TextOverflow.ellipsis,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          color: colors
-                                              .onSurfaceVariant,
+                                          color: colors.onSurfaceVariant,
                                           fontSize: 13,
                                         ),
                                       ),
@@ -222,9 +198,7 @@ class CoursesPage extends ConsumerWidget {
                                     value: 'delete',
                                     child: Row(
                                       children: [
-                                        const Icon(
-                                          Icons.delete_outline,
-                                        ),
+                                        const Icon(Icons.delete_outline),
                                         const SizedBox(width: 12),
                                         Text(l10n.delete),
                                       ],
@@ -236,8 +210,7 @@ class CoursesPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 20),
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 l10n.progress,
@@ -289,9 +262,7 @@ class CoursesPage extends ConsumerWidget {
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(l10n.deleteCourse),
-          content: Text(
-            l10n.deleteCourseConfirmation(courseName),
-          ),
+          content: Text(l10n.deleteCourseConfirmation(courseName)),
           actions: [
             TextButton(
               onPressed: () {
@@ -315,20 +286,14 @@ class CoursesPage extends ConsumerWidget {
     }
 
     try {
-      await ref
-          .read(courseControllerProvider.notifier)
-          .deleteCourse(courseId);
+      await ref.read(courseControllerProvider.notifier).deleteCourse(courseId);
     } catch (error) {
       if (!context.mounted) {
         return;
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.failedToDeleteCourse(error.toString()),
-          ),
-        ),
+        SnackBar(content: Text(l10n.failedToDeleteCourse(error.toString()))),
       );
     }
   }
@@ -349,9 +314,7 @@ class CoursesPage extends ConsumerWidget {
       text: isEditing ? course.description ?? '' : '',
     );
 
-    var progress = isEditing
-        ? (course.progress as double)
-        : 0.0;
+    var progress = isEditing ? (course.progress as double) : 0.0;
 
     showDialog(
       context: context,
@@ -363,9 +326,7 @@ class CoursesPage extends ConsumerWidget {
             return AlertDialog(
               title: Text(
                 isEditing ? l10n.editCourse : l10n.createCourse,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -373,44 +334,35 @@ class CoursesPage extends ConsumerWidget {
                   children: [
                     TextField(
                       controller: nameController,
-                      textCapitalization:
-                          TextCapitalization.sentences,
+                      textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
                         labelText: l10n.courseName,
-                        prefixIcon:
-                            const Icon(Icons.school_outlined),
+                        prefixIcon: const Icon(Icons.school_outlined),
                       ),
                     ),
                     const SizedBox(height: 14),
                     TextField(
                       controller: descriptionController,
                       maxLines: 3,
-                      textCapitalization:
-                          TextCapitalization.sentences,
+                      textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
                         labelText: l10n.description,
                         hintText: l10n.optional,
-                        prefixIcon:
-                            const Icon(Icons.notes_rounded),
+                        prefixIcon: const Icon(Icons.notes_rounded),
                       ),
                     ),
                     const SizedBox(height: 22),
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           l10n.progress,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                         Text(
                           '${progress.toStringAsFixed(0)}%',
                           style: TextStyle(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary,
+                            color: Theme.of(context).colorScheme.primary,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -421,8 +373,7 @@ class CoursesPage extends ConsumerWidget {
                       min: 0,
                       max: 100,
                       divisions: 100,
-                      label:
-                          '${progress.toStringAsFixed(0)}%',
+                      label: '${progress.toStringAsFixed(0)}%',
                       onChanged: (value) {
                         setState(() {
                           progress = value;
@@ -445,17 +396,11 @@ class CoursesPage extends ConsumerWidget {
                   onPressed: isSaving
                       ? null
                       : () async {
-                          final name =
-                              nameController.text.trim();
+                          final name = nameController.text.trim();
 
                           if (name.isEmpty) {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  l10n.courseNameRequired,
-                                ),
-                              ),
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.courseNameRequired)),
                             );
                             return;
                           }
@@ -465,37 +410,28 @@ class CoursesPage extends ConsumerWidget {
                           });
 
                           try {
-                            final description =
-                                descriptionController.text
-                                    .trim();
+                            final description = descriptionController.text
+                                .trim();
 
                             if (isEditing) {
                               await ref
-                                  .read(
-                                    courseControllerProvider
-                                        .notifier,
-                                  )
+                                  .read(courseControllerProvider.notifier)
                                   .updateCourse(
                                     courseId: course.id,
                                     name: name,
-                                    description:
-                                        description.isEmpty
-                                            ? null
-                                            : description,
+                                    description: description.isEmpty
+                                        ? null
+                                        : description,
                                     progress: progress,
                                   );
                             } else {
                               await ref
-                                  .read(
-                                    courseControllerProvider
-                                        .notifier,
-                                  )
+                                  .read(courseControllerProvider.notifier)
                                   .createCourse(
                                     name: name,
-                                    description:
-                                        description.isEmpty
-                                            ? null
-                                            : description,
+                                    description: description.isEmpty
+                                        ? null
+                                        : description,
                                     progress: progress,
                                   );
                             }
@@ -512,14 +448,10 @@ class CoursesPage extends ConsumerWidget {
                               isSaving = false;
                             });
 
-                            ScaffoldMessenger.of(
-                              dialogContext,
-                            ).showSnackBar(
+                            ScaffoldMessenger.of(dialogContext).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  l10n.failedToSaveCourse(
-                                    error.toString(),
-                                  ),
+                                  l10n.failedToSaveCourse(error.toString()),
                                 ),
                               ),
                             );
@@ -529,76 +461,15 @@ class CoursesPage extends ConsumerWidget {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(
-                          isEditing ? l10n.saveChanges : l10n.create,
-                        ),
+                      : Text(isEditing ? l10n.saveChanges : l10n.create),
                 ),
               ],
             );
           },
         );
       },
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  final String message;
-  final String error;
-  final VoidCallback onRetry;
-
-  const _ErrorState({
-    required this.message,
-    required this.error,
-    required this.onRetry,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context)!;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.cloud_off_rounded,
-              size: 64,
-              color: colors.error,
-            ),
-            const SizedBox(height: 18),
-            Text(
-              message,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(l10n.tryAgain),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

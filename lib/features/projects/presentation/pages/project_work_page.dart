@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/date_format.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../work/domain/entities/task.dart';
 import '../../../work/presentation/providers/task_controller.dart';
+import '../../../work/presentation/widgets/work_chip.dart';
+import '../../../work/presentation/widgets/work_dialog.dart';
+import '../../../work/presentation/widgets/work_labels.dart';
 
 class ProjectWorkPage extends ConsumerWidget {
   final String projectId;
@@ -18,11 +23,12 @@ class ProjectWorkPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final workAsync = ref.watch(taskControllerProvider);
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '$projectName — Work',
+          '$projectName — ${l10n.work}',
           style: const TextStyle(
             fontWeight: FontWeight.w800,
           ),
@@ -30,10 +36,10 @@ class ProjectWorkPage extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          _showWorkDialog(context, ref);
+          showWorkDialog(context, ref, fixedProjectId: projectId);
         },
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Add work'),
+        label: Text(l10n.addWork),
       ),
       body: workAsync.when(
         loading: () => const Center(
@@ -45,13 +51,14 @@ class ProjectWorkPage extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.error_outline_rounded,
                   size: 48,
+                  color: colors.error,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Unable to load project work.',
+                Text(
+                  l10n.unableToLoadWork,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
@@ -65,7 +72,7 @@ class ProjectWorkPage extends ConsumerWidget {
                         .read(taskControllerProvider.notifier)
                         .refreshTasks();
                   },
-                  child: const Text('Retry'),
+                  child: Text(l10n.tryAgain),
                 ),
               ],
             ),
@@ -95,9 +102,9 @@ class ProjectWorkPage extends ConsumerWidget {
                     color: colors.primary,
                   ),
                   const SizedBox(height: 20),
-                  const Center(
+                  Center(
                     child: Text(
-                      'No work for this project',
+                      l10n.noWorkYet,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -110,7 +117,7 @@ class ProjectWorkPage extends ConsumerWidget {
                       horizontal: 40,
                     ),
                     child: Text(
-                      'Add work items that belong to this project.',
+                      l10n.addWorkDescription,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: colors.onSurfaceVariant,
@@ -143,10 +150,11 @@ class ProjectWorkPage extends ConsumerWidget {
                 return _WorkCard(
                   item: item,
                   onEdit: () {
-                    _showWorkDialog(
+                    showWorkDialog(
                       context,
                       ref,
-                      item: item,
+                      existing: item,
+                      fixedProjectId: projectId,
                     );
                   },
                   onDelete: () {
@@ -170,26 +178,28 @@ class ProjectWorkPage extends ConsumerWidget {
     WidgetRef ref,
     WorkItem item,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Delete work?'),
+          title: Text(l10n.deleteWork),
           content: Text(
-            'Are you sure you want to delete "${item.title}"?',
+            l10n.deleteWorkConfirmation(item.title),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              child: const Text('Delete'),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -203,342 +213,6 @@ class ProjectWorkPage extends ConsumerWidget {
     await ref
         .read(taskControllerProvider.notifier)
         .deleteTask(item.id);
-  }
-
-  void _showWorkDialog(
-    BuildContext context,
-    WidgetRef ref, {
-    WorkItem? item,
-  }) {
-    final isEditing = item != null;
-
-    final titleController = TextEditingController(
-      text: item?.title ?? '',
-    );
-
-    final descriptionController = TextEditingController(
-      text: item?.description ?? '',
-    );
-
-    var selectedType = item?.type ?? 'other';
-    var selectedStatus = item?.status ?? 'pending';
-    var selectedPriority = item?.priority ?? 'medium';
-    DateTime? selectedDueDate = item?.dueDate;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        var isSaving = false;
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final screenHeight =
-                MediaQuery.sizeOf(context).height;
-
-            return AlertDialog(
-              title: Text(
-                isEditing ? 'Edit work' : 'Add project work',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
-                height: screenHeight * 0.55,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: titleController,
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          labelText: 'Title',
-                          prefixIcon: Icon(
-                            Icons.title_rounded,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      TextField(
-                        controller: descriptionController,
-                        maxLines: 3,
-                        decoration: const InputDecoration(
-                          labelText: 'Description',
-                          hintText: 'Optional',
-                          prefixIcon: Icon(
-                            Icons.notes_rounded,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      DropdownButtonFormField<String>(
-                        initialValue: selectedType,
-                        decoration: const InputDecoration(
-                          labelText: 'Type',
-                          prefixIcon: Icon(
-                            Icons.category_outlined,
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'homework',
-                            child: Text('Homework'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'assignment',
-                            child: Text('Assignment'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'reading',
-                            child: Text('Reading'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'exercise',
-                            child: Text('Exercise'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'exam',
-                            child: Text('Exam'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'quiz',
-                            child: Text('Quiz'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'practice',
-                            child: Text('Practice'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'other',
-                            child: Text('Other'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              selectedType = value;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 14),
-                      DropdownButtonFormField<String>(
-                        initialValue: selectedStatus,
-                        decoration: const InputDecoration(
-                          labelText: 'Status',
-                          prefixIcon: Icon(
-                            Icons.flag_outlined,
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'pending',
-                            child: Text('Pending'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'in_progress',
-                            child: Text('In progress'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'completed',
-                            child: Text('Completed'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              selectedStatus = value;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 14),
-                      DropdownButtonFormField<String>(
-                        initialValue: selectedPriority,
-                        decoration: const InputDecoration(
-                          labelText: 'Priority',
-                          prefixIcon: Icon(
-                            Icons.priority_high_rounded,
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'low',
-                            child: Text('Low'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'medium',
-                            child: Text('Medium'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'high',
-                            child: Text('High'),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              selectedPriority = value;
-                            });
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 14),
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: const Icon(
-                          Icons.calendar_today_outlined,
-                        ),
-                        title: Text(
-                          selectedDueDate == null
-                              ? 'Due date'
-                              : _formatDate(selectedDueDate!),
-                        ),
-                        subtitle: const Text('Optional'),
-                        trailing: selectedDueDate == null
-                            ? null
-                            : IconButton(
-                                tooltip: 'Remove due date',
-                                onPressed: () {
-                                  setState(() {
-                                    selectedDueDate = null;
-                                  });
-                                },
-                                icon: const Icon(
-                                  Icons.clear_rounded,
-                                ),
-                              ),
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate:
-                                selectedDueDate ??
-                                    DateTime.now(),
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime(2100),
-                          );
-
-                          if (date != null) {
-                            setState(() {
-                              selectedDueDate = date;
-                            });
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isSaving
-                      ? null
-                      : () {
-                          Navigator.pop(dialogContext);
-                        },
-                  child: const Text('Cancel'),
-                ),
-                FilledButton(
-                  onPressed: isSaving
-                      ? null
-                      : () async {
-                          final title =
-                              titleController.text.trim();
-
-                          if (title.isEmpty) {
-                            return;
-                          }
-
-                          setState(() {
-                            isSaving = true;
-                          });
-
-                          try {
-                            final description =
-                                descriptionController.text
-                                    .trim();
-
-                            if (isEditing) {
-                              await ref
-                                  .read(
-                                    taskControllerProvider
-                                        .notifier,
-                                  )
-                                  .updateTask(
-                                    taskId: item.id,
-                                    title: title,
-                                    description:
-                                        description.isEmpty
-                                            ? null
-                                            : description,
-                                    courseId: item.courseId,
-                                    projectId: projectId,
-                                    type: selectedType,
-                                    status: selectedStatus,
-                                    priority: selectedPriority,
-                                    dueDate: selectedDueDate,
-                                  );
-                            } else {
-                              await ref
-                                  .read(
-                                    taskControllerProvider
-                                        .notifier,
-                                  )
-                                  .createTask(
-                                    title: title,
-                                    description:
-                                        description.isEmpty
-                                            ? null
-                                            : description,
-                                    projectId: projectId,
-                                    type: selectedType,
-                                    status: selectedStatus,
-                                    priority: selectedPriority,
-                                    dueDate: selectedDueDate,
-                                  );
-                            }
-
-                            if (dialogContext.mounted) {
-                              Navigator.pop(dialogContext);
-                            }
-                          } catch (error) {
-                            if (!dialogContext.mounted) {
-                              return;
-                            }
-
-                            setState(() {
-                              isSaving = false;
-                            });
-
-                            ScaffoldMessenger.of(
-                              dialogContext,
-                            ).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Failed to save work: $error',
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                  child: isSaving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          isEditing ? 'Save changes' : 'Create',
-                        ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
   }
 }
 
@@ -556,6 +230,7 @@ class _WorkCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -578,14 +253,14 @@ class _WorkCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Edit work',
+                  tooltip: l10n.edit,
                   onPressed: onEdit,
                   icon: const Icon(
                     Icons.edit_rounded,
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Delete work',
+                  tooltip: l10n.delete,
                   onPressed: onDelete,
                   icon: const Icon(
                     Icons.delete_outline_rounded,
@@ -610,21 +285,21 @@ class _WorkCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _Chip(
-                  label: _typeLabel(item.type),
+                WorkChip(
+                  label: workTypeLabel(context, item.type),
                   icon: Icons.category_outlined,
                 ),
-                _Chip(
-                  label: _statusLabel(item.status),
+                WorkChip(
+                  label: workStatusLabel(context, item.status),
                   icon: Icons.flag_outlined,
                 ),
-                _Chip(
-                  label: _priorityLabel(item.priority),
+                WorkChip(
+                  label: workPriorityLabel(context, item.priority),
                   icon: Icons.priority_high_rounded,
                 ),
                 if (item.dueDate != null)
-                  _Chip(
-                    label: _formatDate(item.dueDate!),
+                  WorkChip(
+                    label: formatDate(item.dueDate!),
                     icon: Icons.calendar_today_outlined,
                   ),
               ],
@@ -634,74 +309,4 @@ class _WorkCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class _Chip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-
-  const _Chip({
-    required this.label,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      avatar: Icon(
-        icon,
-        size: 16,
-      ),
-      label: Text(label),
-    );
-  }
-}
-
-String _typeLabel(String type) {
-  switch (type) {
-    case 'homework':
-      return 'Homework';
-    case 'assignment':
-      return 'Assignment';
-    case 'reading':
-      return 'Reading';
-    case 'exercise':
-      return 'Exercise';
-    case 'exam':
-      return 'Exam';
-    case 'quiz':
-      return 'Quiz';
-    case 'practice':
-      return 'Practice';
-    default:
-      return 'Other';
-  }
-}
-
-String _statusLabel(String status) {
-  switch (status) {
-    case 'in_progress':
-      return 'In progress';
-    case 'completed':
-      return 'Completed';
-    default:
-      return 'Pending';
-  }
-}
-
-String _priorityLabel(String priority) {
-  switch (priority) {
-    case 'high':
-      return 'High priority';
-    case 'low':
-      return 'Low priority';
-    default:
-      return 'Medium priority';
-  }
-}
-
-String _formatDate(DateTime date) {
-  return '${date.day.toString().padLeft(2, '0')}/'
-      '${date.month.toString().padLeft(2, '0')}/'
-      '${date.year}';
 }

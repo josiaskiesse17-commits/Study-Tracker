@@ -348,4 +348,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get projectActions => 'Project actions';
+
+  @override
+  String get milestone => 'Milestone';
+
+  @override
+  String get newMilestone => 'New milestone';
+
+  @override
+  String get editMilestone => 'Edit milestone';
+
+  @override
+  String get deleteMilestone => 'Delete milestone?';
+
+  @override
+  String deleteMilestoneConfirmation(Object title) {
+    return 'Delete \"$title\"? This cannot be undone.';
+  }
+
+  @override
+  String get noMilestonesYet => 'No milestones yet';
+
+  @override
+  String get createMilestoneDescription => 'Break this project into smaller goals.';
+
+  @override
+  String get noDueDate => 'No due date';
+
+  @override
+  String get chooseDueDate => 'Choose due date';
+
+  @override
+  String get couldNotLoadMilestones => 'Could not load milestones.';
+
+  @override
+  String get couldNotLoadProjectDetails => 'Could not load project details.';
+
+  @override
+  String get writeErrorMessage => 'Couldn\'t save your last change. Please try again.';
 }

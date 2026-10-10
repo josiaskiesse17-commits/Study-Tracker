@@ -748,6 +748,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Project actions'**
   String get projectActions;
+
+  /// No description provided for @milestone.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone'**
+  String get milestone;
+
+  /// No description provided for @newMilestone.
+  ///
+  /// In en, this message translates to:
+  /// **'New milestone'**
+  String get newMilestone;
+
+  /// No description provided for @editMilestone.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit milestone'**
+  String get editMilestone;
+
+  /// No description provided for @deleteMilestone.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete milestone?'**
+  String get deleteMilestone;
+
+  /// No description provided for @deleteMilestoneConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\"? This cannot be undone.'**
+  String deleteMilestoneConfirmation(Object title);
+
+  /// No description provided for @noMilestonesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No milestones yet'**
+  String get noMilestonesYet;
+
+  /// No description provided for @createMilestoneDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Break this project into smaller goals.'**
+  String get createMilestoneDescription;
+
+  /// No description provided for @noDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No due date'**
+  String get noDueDate;
+
+  /// No description provided for @chooseDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose due date'**
+  String get chooseDueDate;
+
+  /// No description provided for @couldNotLoadMilestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load milestones.'**
+  String get couldNotLoadMilestones;
+
+  /// No description provided for @couldNotLoadProjectDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load project details.'**
+  String get couldNotLoadProjectDetails;
+
+  /// No description provided for @writeErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save your last change. Please try again.'**
+  String get writeErrorMessage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
