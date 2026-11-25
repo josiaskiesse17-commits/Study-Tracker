@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -48,7 +49,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enterPassword => 'Entrez votre mot de passe';
 
   @override
-  String get passwordMinLength => 'Le mot de passe doit contenir au moins 6 caractères';
+  String get passwordMinLength =>
+      'Le mot de passe doit contenir au moins 6 caractères';
 
   @override
   String get dashboard => 'Tableau de bord';
@@ -101,13 +103,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get logout => 'Déconnexion';
 
   @override
-  String get keepLearningMessage => 'Continuez à apprendre, restez organisé et progressez chaque jour.';
+  String get keepLearningMessage =>
+      'Continuez à apprendre, restez organisé et progressez chaque jour.';
 
   @override
   String get yourWorkspace => 'Votre espace de travail';
 
   @override
-  String get manageLearningMessage => 'Gérez votre apprentissage depuis un seul endroit.';
+  String get manageLearningMessage =>
+      'Gérez votre apprentissage depuis un seul endroit.';
 
   @override
   String get trackCourseProgress => 'Suivez la progression de vos cours';
@@ -122,7 +126,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get stayConsistent => 'Restez constant';
 
   @override
-  String get stayConsistentMessage => 'Découpez vos objectifs d\'apprentissage en petites tâches et maintenez vos cours à jour.';
+  String get stayConsistentMessage =>
+      'Découpez vos objectifs d\'apprentissage en petites tâches et maintenez vos cours à jour.';
 
   @override
   String get myCourses => 'Mes cours';
@@ -137,7 +142,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noCoursesYet => 'Aucun cours pour le moment';
 
   @override
-  String get createFirstCourse => 'Créez votre premier cours et commencez à suivre votre progression.';
+  String get createFirstCourse =>
+      'Créez votre premier cours et commencez à suivre votre progression.';
 
   @override
   String get edit => 'Modifier';
@@ -200,7 +206,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noWorkYet => 'Aucun travail pour le moment';
 
   @override
-  String get addWorkDescription => 'Ajoutez des devoirs, travaux, lectures, examens, exercices et autres tâches à accomplir.';
+  String get addWorkDescription =>
+      'Ajoutez des devoirs, travaux, lectures, examens, exercices et autres tâches à accomplir.';
 
   @override
   String get addWork => 'Ajouter un travail';
@@ -344,7 +351,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noProjectsYet => 'Aucun projet pour le moment';
 
   @override
-  String get createProjectDescription => 'Créez un projet pour organiser un travail plus important.';
+  String get createProjectDescription =>
+      'Créez un projet pour organiser un travail plus important.';
 
   @override
   String get projectActions => 'Actions du projet';
@@ -370,7 +378,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noMilestonesYet => 'Aucun jalon pour le moment';
 
   @override
-  String get createMilestoneDescription => 'Divisez ce projet en objectifs plus petits.';
+  String get createMilestoneDescription =>
+      'Divisez ce projet en objectifs plus petits.';
 
   @override
   String get noDueDate => 'Aucune date d\'échéance';
@@ -382,8 +391,154 @@ class AppLocalizationsFr extends AppLocalizations {
   String get couldNotLoadMilestones => 'Impossible de charger les jalons.';
 
   @override
-  String get couldNotLoadProjectDetails => 'Impossible de charger les détails du projet.';
+  String get couldNotLoadProjectDetails =>
+      'Impossible de charger les détails du projet.';
 
   @override
-  String get writeErrorMessage => 'Impossible d\'enregistrer votre dernière modification. Veuillez réessayer.';
+  String get writeErrorMessage =>
+      'Impossible d\'enregistrer votre dernière modification. Veuillez réessayer.';
+
+  @override
+  String get opportunities => 'Opportunités';
+
+  @override
+  String get opportunity => 'Opportunité';
+
+  @override
+  String get noOpportunitiesYet => 'Aucune opportunité pour le moment';
+
+  @override
+  String get createOpportunityDescription =>
+      'Suivez vos bourses et événements pour ne jamais manquer une échéance.';
+
+  @override
+  String get createOpportunity => 'Créer une opportunité';
+
+  @override
+  String get editOpportunity => 'Modifier l\'opportunité';
+
+  @override
+  String get opportunityName => 'Nom de l\'opportunité';
+
+  @override
+  String get opportunityNameRequired =>
+      'Le nom de l\'opportunité est obligatoire.';
+
+  @override
+  String get organizer => 'Organisateur';
+
+  @override
+  String get url => 'Site web';
+
+  @override
+  String get enterUrl => 'Entrez une URL';
+
+  @override
+  String get invalidUrl => 'Veuillez entrer une URL valide.';
+
+  @override
+  String get eligibility => 'Éligibilité';
+
+  @override
+  String get requirements => 'Exigences';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get deadlineOrEventDate => 'Date limite / date de l\'événement';
+
+  @override
+  String get scholarship => 'Bourse';
+
+  @override
+  String get event => 'Événement';
+
+  @override
+  String get considering => 'À l\'étude';
+
+  @override
+  String get preparing => 'En préparation';
+
+  @override
+  String get applied => 'Candidat';
+
+  @override
+  String get awarded => 'Attrigé';
+
+  @override
+  String get rejected => 'Refusé';
+
+  @override
+  String get withdrawn => 'Retiré';
+
+  @override
+  String get registered => 'Inscrit';
+
+  @override
+  String get attended => 'Présent';
+
+  @override
+  String get missed => 'Manqué';
+
+  @override
+  String get cancelled => 'Annulé';
+
+  @override
+  String get nextAction => 'Action suivante';
+
+  @override
+  String get nextActionDueDate => 'Date de l\'action suivante';
+
+  @override
+  String get remindMe => 'Me rappeler';
+
+  @override
+  String get remindMeDescription =>
+      'Recevoir une notification avant cette date.';
+
+  @override
+  String get reminderNotSupported =>
+      'Les notifications ne sont pas prises en charge sur cette plateforme.';
+
+  @override
+  String get permissionDenied =>
+      'La permission de notification a été refusée. Vous pouvez toujours suivre vos opportunités dans l\'application.';
+
+  @override
+  String failedToSaveOpportunity(Object error) {
+    return 'Échec de l\'enregistrement de l\'opportunité : $error';
+  }
+
+  @override
+  String failedToDeleteOpportunity(Object error) {
+    return 'Échec de la suppression de l\'opportunité : $error';
+  }
+
+  @override
+  String get deleteOpportunity => 'Supprimer l\'opportunité ?';
+
+  @override
+  String deleteOpportunityConfirmation(Object opportunityName) {
+    return 'Voulez-vous vraiment supprimer « $opportunityName » ?';
+  }
+
+  @override
+  String get unableToLoadOpportunities =>
+      'Impossible de charger les opportunités.';
+
+  @override
+  String get filterAll => 'Tous';
+
+  @override
+  String get filterScholarships => 'Bourses';
+
+  @override
+  String get filterEvents => 'Événements';
+
+  @override
+  String get overdue => 'En retard';
+
+  @override
+  String get upcoming => 'À venir';
 }

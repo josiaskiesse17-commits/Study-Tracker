@@ -62,7 +62,8 @@ import 'app_localizations_fr.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('fr')
+    Locale('fr'),
   ];
 
   /// No description provided for @login.
@@ -820,9 +823,274 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t save your last change. Please try again.'**
   String get writeErrorMessage;
+
+  /// No description provided for @opportunities.
+  ///
+  /// In en, this message translates to:
+  /// **'Opportunities'**
+  String get opportunities;
+
+  /// No description provided for @opportunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Opportunity'**
+  String get opportunity;
+
+  /// No description provided for @noOpportunitiesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No opportunities yet'**
+  String get noOpportunitiesYet;
+
+  /// No description provided for @createOpportunityDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Track scholarships and events so you never miss a deadline.'**
+  String get createOpportunityDescription;
+
+  /// No description provided for @createOpportunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Create opportunity'**
+  String get createOpportunity;
+
+  /// No description provided for @editOpportunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit opportunity'**
+  String get editOpportunity;
+
+  /// No description provided for @opportunityName.
+  ///
+  /// In en, this message translates to:
+  /// **'Opportunity name'**
+  String get opportunityName;
+
+  /// No description provided for @opportunityNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Opportunity name is required.'**
+  String get opportunityNameRequired;
+
+  /// No description provided for @organizer.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer'**
+  String get organizer;
+
+  /// No description provided for @url.
+  ///
+  /// In en, this message translates to:
+  /// **'URL'**
+  String get url;
+
+  /// No description provided for @enterUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a website URL'**
+  String get enterUrl;
+
+  /// No description provided for @invalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid URL.'**
+  String get invalidUrl;
+
+  /// No description provided for @eligibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Eligibility'**
+  String get eligibility;
+
+  /// No description provided for @requirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Requirements'**
+  String get requirements;
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// No description provided for @deadlineOrEventDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline / event date'**
+  String get deadlineOrEventDate;
+
+  /// No description provided for @scholarship.
+  ///
+  /// In en, this message translates to:
+  /// **'Scholarship'**
+  String get scholarship;
+
+  /// No description provided for @event.
+  ///
+  /// In en, this message translates to:
+  /// **'Event'**
+  String get event;
+
+  /// No description provided for @considering.
+  ///
+  /// In en, this message translates to:
+  /// **'Considering'**
+  String get considering;
+
+  /// No description provided for @preparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing'**
+  String get preparing;
+
+  /// No description provided for @applied.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied'**
+  String get applied;
+
+  /// No description provided for @awarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Awarded'**
+  String get awarded;
+
+  /// No description provided for @rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get rejected;
+
+  /// No description provided for @withdrawn.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdrawn'**
+  String get withdrawn;
+
+  /// No description provided for @registered.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get registered;
+
+  /// No description provided for @attended.
+  ///
+  /// In en, this message translates to:
+  /// **'Attended'**
+  String get attended;
+
+  /// No description provided for @missed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get missed;
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
+  /// No description provided for @nextAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Next action'**
+  String get nextAction;
+
+  /// No description provided for @nextActionDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Next action due date'**
+  String get nextActionDueDate;
+
+  /// No description provided for @remindMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get remindMe;
+
+  /// No description provided for @remindMeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive a local notification before this date.'**
+  String get remindMeDescription;
+
+  /// No description provided for @reminderNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are not supported on this platform.'**
+  String get reminderNotSupported;
+
+  /// No description provided for @permissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission was denied. You can still track opportunities in the app.'**
+  String get permissionDenied;
+
+  /// No description provided for @failedToSaveOpportunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save opportunity: {error}'**
+  String failedToSaveOpportunity(Object error);
+
+  /// No description provided for @failedToDeleteOpportunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete opportunity: {error}'**
+  String failedToDeleteOpportunity(Object error);
+
+  /// No description provided for @deleteOpportunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete opportunity?'**
+  String get deleteOpportunity;
+
+  /// No description provided for @deleteOpportunityConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{opportunityName}\"?'**
+  String deleteOpportunityConfirmation(Object opportunityName);
+
+  /// No description provided for @unableToLoadOpportunities.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load opportunities.'**
+  String get unableToLoadOpportunities;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterScholarships.
+  ///
+  /// In en, this message translates to:
+  /// **'Scholarships'**
+  String get filterScholarships;
+
+  /// No description provided for @filterEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get filterEvents;
+
+  /// No description provided for @overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdue;
+
+  /// No description provided for @upcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcoming;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -831,25 +1099,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'fr': return AppLocalizationsFr();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'fr':
+      return AppLocalizationsFr();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

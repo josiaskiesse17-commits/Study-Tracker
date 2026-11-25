@@ -176,5 +176,74 @@
 
   "couldNotLoadMilestones": "Impossible de charger les jalons.",
   "couldNotLoadProjectDetails": "Impossible de charger les détails du projet.",
-  "writeErrorMessage": "Impossible d'enregistrer votre dernière modification. Veuillez réessayer."
+  "writeErrorMessage": "Impossible d'enregistrer votre dernière modification. Veuillez réessayer.",
+
+  "opportunities": "Opportunités",
+  "opportunity": "Opportunité",
+  "noOpportunitiesYet": "Aucune opportunité pour le moment",
+  "createOpportunityDescription": "Suivez vos bourses et événements pour ne jamais manquer une échéance.",
+  "createOpportunity": "Créer une opportunité",
+  "editOpportunity": "Modifier l'opportunité",
+  "opportunityName": "Nom de l'opportunité",
+  "opportunityNameRequired": "Le nom de l'opportunité est obligatoire.",
+  "organizer": "Organisateur",
+  "url": "Site web",
+  "enterUrl": "Entrez une URL",
+  "invalidUrl": "Veuillez entrer une URL valide.",
+  "eligibility": "Éligibilité",
+  "requirements": "Exigences",
+  "notes": "Notes",
+  "deadlineOrEventDate": "Date limite / date de l'événement",
+  "scholarship": "Bourse",
+  "event": "Événement",
+  "type": "Type",
+  "status": "Statut",
+  "considering": "À l'étude",
+  "preparing": "En préparation",
+  "applied": "Candidat",
+  "awarded": "Attrigé",
+  "rejected": "Refusé",
+  "withdrawn": "Retiré",
+  "registered": "Inscrit",
+  "attended": "Présent",
+  "missed": "Manqué",
+  "cancelled": "Annulé",
+  "nextAction": "Action suivante",
+  "nextActionDueDate": "Date de l'action suivante",
+  "remindMe": "Me rappeler",
+  "remindMeDescription": "Recevoir une notification avant cette date.",
+  "reminderNotSupported": "Les notifications ne sont pas prises en charge sur cette plateforme.",
+  "permissionDenied": "La permission de notification a été refusée. Vous pouvez toujours suivre vos opportunités dans l'application.",
+  "failedToSaveOpportunity": "Échec de l'enregistrement de l'opportunité : {error}",
+  "@failedToSaveOpportunity": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "failedToDeleteOpportunity": "Échec de la suppression de l'opportunité : {error}",
+  "@failedToDeleteOpportunity": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "deleteOpportunity": "Supprimer l'opportunité ?",
+  "deleteOpportunityConfirmation": "Voulez-vous vraiment supprimer « {opportunityName} » ?",
+  "@deleteOpportunityConfirmation": {
+    "placeholders": {
+      "opportunityName": {}
+    }
+  },
+  "unableToLoadOpportunities": "Impossible de charger les opportunités.",
+  "filterAll": "Tous",
+  "filterScholarships": "Bourses",
+  "filterEvents": "Événements",
+  "overdue": "En retard",
+  "upcoming": "À venir",
+  "noDueDate": "Aucune date d'échéance",
+  "save": "Enregistrer",
+  "create": "Créer",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "tryAgain": "Réessayer",
+  "edit": "Modifier"
 }

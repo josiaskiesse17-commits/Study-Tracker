@@ -9,6 +9,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/courses/presentation/pages/courses_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/opportunities/presentation/pages/opportunities_page.dart';
 import '../../features/projects/domain/entities/project.dart';
 import '../../features/projects/presentation/pages/project_details_page.dart';
 import '../../features/projects/presentation/pages/projects_page.dart';
@@ -41,10 +42,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
 
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
 
       GoRoute(
         path: '/register',
@@ -61,10 +59,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const CoursesPage(),
       ),
 
-      GoRoute(
-        path: '/tasks',
-        builder: (context, state) => const TasksPage(),
-      ),
+      GoRoute(path: '/tasks', builder: (context, state) => const TasksPage()),
 
       GoRoute(
         path: '/projects',
@@ -72,13 +67,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(
+        path: '/opportunities',
+        builder: (context, state) => const OpportunitiesPage(),
+      ),
+
+      GoRoute(
         path: '/projects/:id',
         builder: (context, state) {
           final project = state.extra as Project;
 
-          return ProjectDetailsPage(
-            project: project,
-          );
+          return ProjectDetailsPage(project: project);
         },
       ),
     ],

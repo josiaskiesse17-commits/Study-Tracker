@@ -176,5 +176,74 @@
 
   "couldNotLoadMilestones": "Could not load milestones.",
   "couldNotLoadProjectDetails": "Could not load project details.",
-  "writeErrorMessage": "Couldn't save your last change. Please try again."
+  "writeErrorMessage": "Couldn't save your last change. Please try again.",
+
+  "opportunities": "Opportunities",
+  "opportunity": "Opportunity",
+  "noOpportunitiesYet": "No opportunities yet",
+  "createOpportunityDescription": "Track scholarships and events so you never miss a deadline.",
+  "createOpportunity": "Create opportunity",
+  "editOpportunity": "Edit opportunity",
+  "opportunityName": "Opportunity name",
+  "opportunityNameRequired": "Opportunity name is required.",
+  "organizer": "Organizer",
+  "url": "URL",
+  "enterUrl": "Enter a website URL",
+  "invalidUrl": "Please enter a valid URL.",
+  "eligibility": "Eligibility",
+  "requirements": "Requirements",
+  "notes": "Notes",
+  "deadlineOrEventDate": "Deadline / event date",
+  "scholarship": "Scholarship",
+  "event": "Event",
+  "type": "Type",
+  "status": "Status",
+  "considering": "Considering",
+  "preparing": "Preparing",
+  "applied": "Applied",
+  "awarded": "Awarded",
+  "rejected": "Rejected",
+  "withdrawn": "Withdrawn",
+  "registered": "Registered",
+  "attended": "Attended",
+  "missed": "Missed",
+  "cancelled": "Cancelled",
+  "nextAction": "Next action",
+  "nextActionDueDate": "Next action due date",
+  "remindMe": "Remind me",
+  "remindMeDescription": "Receive a local notification before this date.",
+  "reminderNotSupported": "Notifications are not supported on this platform.",
+  "permissionDenied": "Notification permission was denied. You can still track opportunities in the app.",
+  "failedToSaveOpportunity": "Failed to save opportunity: {error}",
+  "@failedToSaveOpportunity": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "failedToDeleteOpportunity": "Failed to delete opportunity: {error}",
+  "@failedToDeleteOpportunity": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "deleteOpportunity": "Delete opportunity?",
+  "deleteOpportunityConfirmation": "Are you sure you want to delete \"{opportunityName}\"?",
+  "@deleteOpportunityConfirmation": {
+    "placeholders": {
+      "opportunityName": {}
+    }
+  },
+  "unableToLoadOpportunities": "Unable to load opportunities.",
+  "filterAll": "All",
+  "filterScholarships": "Scholarships",
+  "filterEvents": "Events",
+  "overdue": "Overdue",
+  "upcoming": "Upcoming",
+  "noDueDate": "No due date",
+  "save": "Save",
+  "create": "Create",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "tryAgain": "Try again",
+  "edit": "Edit"
 }

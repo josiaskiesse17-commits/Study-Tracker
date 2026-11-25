@@ -19,10 +19,9 @@ class DashboardPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     final displayName = user?.fullName?.trim();
-    final greetingName =
-        displayName != null && displayName.isNotEmpty
-            ? displayName
-            : l10n.there;
+    final greetingName = displayName != null && displayName.isNotEmpty
+        ? displayName
+        : l10n.there;
 
     return Scaffold(
       appBar: AppBar(
@@ -33,23 +32,18 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () {
-              themeModeNotifier.value =
-                  isDark ? ThemeMode.light : ThemeMode.dark;
+              themeModeNotifier.value = isDark
+                  ? ThemeMode.light
+                  : ThemeMode.dark;
             },
             icon: Icon(
-              isDark
-                  ? Icons.light_mode_rounded
-                  : Icons.dark_mode_rounded,
+              isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
             ),
-            tooltip: isDark
-                ? l10n.switchToLightMode
-                : l10n.switchToDarkMode,
+            tooltip: isDark ? l10n.switchToLightMode : l10n.switchToDarkMode,
           ),
           IconButton(
             onPressed: () async {
-              await ref
-                  .read(authControllerProvider.notifier)
-                  .logout();
+              await ref.read(authControllerProvider.notifier).logout();
             },
             icon: const Icon(Icons.logout_rounded),
             tooltip: l10n.logout,
@@ -109,18 +103,12 @@ class DashboardPage extends ConsumerWidget {
             const SizedBox(height: 28),
             Text(
               l10n.yourWorkspace,
-              style: const TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.w800,
-              ),
+              style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 6),
             Text(
               l10n.manageLearningMessage,
-              style: TextStyle(
-                color: colors.onSurfaceVariant,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: colors.onSurfaceVariant, fontSize: 14),
             ),
             const SizedBox(height: 18),
 
@@ -152,6 +140,17 @@ class DashboardPage extends ConsumerWidget {
               description: l10n.manageLargerProjects,
               onTap: () {
                 context.push('/projects');
+              },
+            ),
+
+            const SizedBox(height: 14),
+
+            _DashboardCard(
+              icon: Icons.card_travel_rounded,
+              title: l10n.opportunities,
+              description: l10n.createOpportunityDescription,
+              onTap: () {
+                context.push('/opportunities');
               },
             ),
 
@@ -241,11 +240,7 @@ class _DashboardCard extends StatelessWidget {
                     color: colors.primaryContainer,
                     borderRadius: BorderRadius.circular(17),
                   ),
-                  child: Icon(
-                    icon,
-                    color: colors.onPrimaryContainer,
-                    size: 27,
-                  ),
+                  child: Icon(icon, color: colors.onPrimaryContainer, size: 27),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
